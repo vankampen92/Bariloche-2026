@@ -1,0 +1,23 @@
+# Compiled files
+*.o
+*.so
+*.exe
+
+# R temporary files
+.Rhistory
+.RData
+.Rproj.user/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Temporary files
+*~
+*.tmp
+
+# Secrets
+.env

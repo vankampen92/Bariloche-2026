@@ -1,0 +1,98 @@
+\subsection{The Method of Characteristics}
+\label{Appendix_Method_of_Characteristics}
+In the context of one-step stochastic process, where rates $g_n$ and $r_n$ are linear in $n$, the partial differential equation (PDE) for the temporal evolution of the probability generating function, $G(x,t)$, results in a linear, first order, partial differential equation. The method of characteristics is a general method to solve these type of equations. 
+\smallskip
+
+A linear, first-order, PDE is given by:
+\begin{equation}
+P(x,y,Z) \frac{\partial Z}{\partial x} + Q(x,y,Z) \frac{\partial Z}{\partial y} = R(x,y,Z)
+\end{equation}
+
+The solution of this PDE will be a surface in $R^3$ that may be given as $z = Z(x,y)$. The method of characteristics finds first curves (called characteristic curves) to define the solution of the initial PDE. These integral curves are called the characteristic curves of the original partial differential equation. They can be found by solving two associated ordinary differential equation, and then used to build the final general solution. 
+%\footnote{Please see {\tt https://en.wikipedia.org/wiki/Method$_$of$_$characteristics} for a geometric argument}. 
+\smallskip
+
+The associated equations for the characteristic curves are usually expressed as:
+\begin{equation}
+\frac{dx}{P(x,y,Z)} = \frac{dy}{Q(x,y,Z)}  = \frac{dZ}{R(x,y,Z)}
+\end{equation}
+
+This is equivalent to two ODEs defining the two characteristic curves. For instance, 
+\begin{equation}
+\frac{dx}{P(x,y,Z)} = \frac{dy}{Q(x,y,Z)}
+\end{equation}
+where $Z$ is just a parameter, and 
+and 
+\begin{equation}
+\frac{dy}{Q(x,y,Z)} = \frac{dZ}{R(x,y,Z)}
+\end{equation}
+where $x$ is just a parameter.  The solution of these two ODEs give rise to two characteristic curves, respectively:
+\begin{eqnarray}
+\label{eq:1stcurve}
+u(x,y,Z) & = & K_1 \\
+v(x,y,Z) & = & K_2 
+\label{eq:2ndcurve}
+\end{eqnarray}
+It can be shown that the general solution of the initial PDE can be written either as:
+\begin{equation}
+\Phi(u,v) = 0
+\end{equation}
+where $\Phi$ is an arbitrary function, or, alternatively, by solving for one of the two variables:
+\begin{equation}
+u = \Psi(v)
+\end{equation}
+where $\Psi$ will be related to the arbitrary function $\Phi$ accordingly. 
+\bigskip
+
+As an example, we will solve the PDE for the probability generating function, $G(x,t)$, associated to a Yule process ---see Eq. (\ref{eq:GenYule}). We define first a new function $M(\theta,t)$ such that $G(x,t)=G(e^{\theta},t) \equiv M(\theta,t)$, where a the change of variable $x = e^{\theta}$ has been used. This change transforms the initial equation into an equivalent one for $M(\theta,t)$: 
+\begin{equation}
+\frac{\partial M(\theta,t)}{\partial t} = \beta (e^{\theta}-1) \frac{\partial M(\theta,t)}{\partial \theta}
+\end{equation}
+which can also be written as:
+\begin{equation}
+\frac{\partial M(\theta,t)}{\partial t} - \beta (e^{\theta}-1) \frac{\partial M(x,t)}{\partial \theta} = 0
+\end{equation}
+
+This writing allows to identify the associated ODEs for the characteristic curves:
+\begin{equation}
+\frac{dt}{1} = \frac{d\theta}{-\beta (e^{\theta}-1)} = \frac{dM}{0}
+\end{equation}
+which can be rewritten as two separate ODES. First, we have:
+\begin{equation}
+\frac{dM}{0} = \frac{dt}{1} \,\, \Rightarrow dM = 0
+\end{equation}
+which involves that $M = K_1$ is the first integral curve. And, finally, we have a second ODE:
+\begin{equation}
+\frac{dt}{1} = \frac{d\theta}{-\beta (e^{\theta}-1)} \Rightarrow \frac{d\theta}{dt} = -\beta (e^{\theta}-1)
+\end{equation}
+The solution of this ODE defines the second integral curve:
+\begin{equation}
+e^{\beta t} \, (1 - e^{-\theta}) = K_2
+\end{equation}
+
+The two characteristic curves allow to write the general solution of the initial PDE as
+\begin{equation}
+\label{eq:M}
+M = \Psi ( e^{\beta t} \, (1 - e^{-\theta}) )
+\end{equation}
+where $\Phi$ is an arbitrary function. The particular solution we are interested in should fulfill certain conditions. We recall here the definition of the function $M(\theta,t)$:
+\begin{equation}
+M(\theta, t) = \sum_{n=0} P(n,t) e^{\theta n}
+\end{equation}
+Since we consider as initial condition a system with only 1 individual, $P(n,0)$ is 1 if $n=1$ and 0 otherwise. Therefore, $M(\theta,0) = e^\theta$, but, from Eq. (\ref{eq:M}), we obtain:
+\begin{equation}
+	e^{\theta} = \Psi( 1 - e^{-\theta} )
+\end{equation}
+This relationship fully determines the shape of the function $\Psi$. It can be checked that:
+\begin{equation}
+	\Psi(x) = \frac{1}{1-x}
+\end{equation}
+This expression can be introduced in the general solution given by Eq. (\ref{eq:M}) to finally obtain:
+\begin{equation}
+	M(\theta,t) = \frac{1}{1 - e^{\beta t} \, (1 - e^{-\theta})}
+\end{equation}
+
+Since $x=e^{\theta}$, by expressing the last function in terms back again of $x$, we obtain the expression for the probability generating function:
+\begin{equation}
+	G(x,t) = \frac{x e^{-\beta t}}{1 - ( 1 - e^{-\beta t} )x}
+\end{equation}

@@ -1,0 +1,18 @@
+\subsection{Michaelis-Menten kinetics and the Holling Type II Functional Response}
+\begin{enumerate}
+\item Consider a tiny reactor of volume $V$ containing a solution of chemical species $A$ and $E$. $E$ is an enzyme catalyzing the conversion of $A$ into a product $W$ through the following catalytic, non-reversible reactions:
+%%% \ch[math-space=0pt]{ E + S <=>[ $k_1$ ][ $k_{-1}$ ] ES <=> EP <=> E + P }
+\begin{equation}
+A \,+ \,E  \xrightarrow{k_1} AE \xrightarrow{k_2} E \,+\, W \nonumber
+\end{equation}    
+However, chemical species $W$ has a tendency to immediately precipitate and disappear from the solution. Consider that the concentration of the enzyme, in each of its two chemical forms, $E$ or $EA$ is constant, $[E] + [EA] = \Phi_E$. The concentration of the chemical species $A$ at the initial time is $[A]= \Phi_A(0) = \Phi_0$. 
+\begin{itemize}
+\item Write first the system of ODEs describing the temporal evolution of the concentration of each of the chemical species involved in the reaction, the {\em macroscopic law}. 
+\item Describe the state of the system through the number of molecules of species A, $n$, and the number of molecules of free enzyme, $E$, $m$. Assume that the total number of molecules of enzyme either free or forming the substrate-enzyme molecule is constant, $M$.   
+\item Write a two dimensional master equation for the temporal evolution of the probability of having $n$ and $m$ molecules of species $A$ and enzyme, respectively. 
+\item Write the total rate for the system undergoing any configuration change. 
+\item Consider that there are $n_0$ molecules of species $A$ and $M$ molecules of free enzyme at the initial time. Take $k_1 = 1$, $k_2 = 10$, $n_0 = 10000$, and $M=100$, and $V=100$. Build stochastic simulations and check that averages of each of the chemical species over stochastic simulations matches its deterministic evolution as described by the {\em macroscopic law}.  
+\item After the initial transient, calculate the temporal evolution for the average of the ratio of the number of free enzyme molecules to the number of substrate-enzyme molecules over stochastic simulations. Is this ratio reaching, approximate, a stationary value? What is the best prediction for this average at this quasi-stationary state?  
+\end{itemize}
+\end{enumerate}
+

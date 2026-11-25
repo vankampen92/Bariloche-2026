@@ -1,0 +1,105 @@
+\documentclass[11pt,a4paper]{article}
+
+\setlength{\marginparwidth}{2cm}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+
+%% The xcolor package is required to highlight table rows with 
+%% different colors. 
+\usepackage{longtable}
+\usepackage{multirow}
+% Sideway figures and tables. 
+\usepackage{rotating}
+
+
+% ----------- Miscellaneous packages
+\usepackage{enumitem}
+\usepackage{chemformula}
+\usepackage[version=4]{mhchem}
+
+\usepackage[ampersand,sharp]{easylist}
+
+
+% ----------- ADD COMMENT COMMANDS --------------------
+\newcommand{\ruby}[1]{\todo[color=green!40]{#1 - Ruby}}
+\newcommand{\studentX}[1]{\todo[color=green!40]{#1 - studentX}} % replace studentX with your name. 
+\newcommand{\vicente}[1]{\todo[color=purple!40]{#1 - vicente}}
+\newcommand{\david}[1]{\todo[color=yellow]{#1 - david}}
+% -----------------------------------------------------
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage[round,authoryear]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=2pt,topsep=4pt}
+\setlist[enumerate]{itemsep=3pt,topsep=4pt}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{{\mathbb F}}
+\newcommand{\Pb}{{\mathbb P}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\Frac}[2]{\left(\frac{#1}{#2}\right)}
+\newcommand{\Eval}[2]{\big|_{#1}^{#2}}
+\newcommand{\intinf}{\int_{-\infty}^{\infty}}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+
+\title{Continuous-Time Stochastic Processes\\\large Advanced Course --- Bariloche, 2026}
+\author{David Alonso}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+% \input{notes_1stSection_Chicago}
+% \input{notes_2onSection_Chicago}
+% \input{notes_3rdSection_Chicago}
+
+\pagebreak
+\input{notes_GeneralIntroduction}
+\input{notes_basic_concepts_revised}
+% \input{notes_1stSection}
+
+\input{notes_Poisson_process_revised}
+
+\input{notes_one_dimensional_master_equations_with_exercises}
+
+% \input{notes_2onSection}
+% \input{backward_master_equation_section}
+% notes_2onSection and backward_master_equation_section have been consolidated in only one tex file: 
+% exticntion_dynamics_qsd_mfpt_section.tex
+\input{extinction_dynamics_qsd_mfpt_section}
+
+\input{multidimensional_master_equations_section}
+
+%\input{notes_SimulationAlgorithms}
+\input{notes_SimulationAlgorithms_revised}
+
+\input{notes_simple_applications_revised}
+\input{seven_applications_section}
+
+\input{problems-and-projects}
+
+\input{Appendix}
+\bibliographystyle{plainnat}
+\bibliography{advanced_course}
+
+\end{document}

@@ -1,0 +1,179 @@
+\subsection{Efficient simulation of spatially extended stochastic systems}
+\label{space}
+Our goal is to extend a model specified for a well-mixed local population to a network of $M$ nodes. As an example, each node will represent a local population undergoing consumer--resource dynamics, and individuals may also move randomly between connected nodes. This spatial extension makes the computational challenge particularly clear: as the number of nodes increases, so does the number of possible stochastic events. However, an event occurring at one node generally changes the transition rates only at that node and, in the case of dispersal, at a neighboring node. The rates in the rest of the network remain unchanged. This local dependence is precisely what efficient algorithms, such as the Next Reaction Method of Gibson and Bruck, exploit through a dependency graph and an event queue. The purpose of this section is to illustrate the importance of this optimization strategy, first through stochastic diffusion and then through a spatially extended consumer--resource model.
+\smallskip
+   
+\subsection*{{\bfseries Stochastic diffusion}}   
+ We first introduce a simple stochastic model for a population diffusing on a discrete network where individuals can jump from node to node at a constant rate $\mu$. We consider a constant total population of $n_A$ individuals of a species $A$ distributed over a series of $M$ nodes. The set of nodes defines a metapopulation network where each node host a population at the spatial location $r_i$. We may use generic graphs to characterize the spatial network. The number of individuals in each node of the network at $r_i$ at time $t$ is given by $n(r_i;t)$ with $n \in [0, \dots, n_A]$, $i \in [1,\cdots,M]$, and $t \in \mathbb{R}$, where the total number of nodes is $M$.
+\smallskip
+
+Let us introduce a short notation to represent the number of individuals at every node $i$ at time $t$:
+\begin{equation}
+n_i \equiv n(r_i;t),
+\label{eq:spatial_state}
+\end{equation}
+for $i=1, \dots, M$, which fully determines the configuration of the system at any given time. 
+\smallskip
+
+The process is completely defined by the initial number of individuals in each site $n(r_i;0)$ ($i \in [1,\cdots,M]$), and the per capita movement rate of each individual into neighboring nodes as defined by the network topology. We first assume that each individual leaves its current node at a total per-capita rate $\mu$, and then chooses one of the available neighboring nodes. If $n_i$ denotes the number of individuals at node $i$, the total movement rate is
+\begin{equation}
+R(t) =  \mu \sum_{i=1}^{M} n_i(t)
+     = \sum_{i=1}^{M} R_i(t), \qquad R_i(t)=\mu n_i(t),
+\label{eq:R_M}
+\end{equation}
+where $R_i$ is the rate at which an individual leaves node $i$. This expression assumes that every occupied node has at least one possible destination. Let $q_{ij}$ be the probability of choosing node $j$ upon departure from $i$, with $\sum_{j\in\mathcal N_i}q_{ij}=1$. The rate of an individual jump $i\to j$ is then $\mu q_{ij}n_i$. For a uniform choice, $q_{ij}=1/|\mathcal N_i|$. We will distinguish this \emph{total departure rate} from a \emph{per-edge jumping rate} below.  
+\smallskip
+
+In general, individual movements can be represented by: 
+\begin{eqnarray}
+A_i + \emptyset_j & \xrightarrow{\mu} &  \emptyset_i + A_j \label{MovementCapacity}
+\end{eqnarray}
+where an individual in node $i$ jumps into node $j$ leaving an empty set behind. However, this representation involves that jumps are allowed or not depending on the existence of enough room in the receiving node (empty sites within that node). In other words, if the receiving node if full, i.e., at carrying capacity, movement into it is forbidden. In what follows, for simplicity, we will not assume a carrying capacity for the species that move. In this case, individual movements can simply be represented by: 
+\begin{eqnarray}
+A_i  & \xrightarrow{\mu} &   A_j \label{Movement}
+\end{eqnarray}
+where here individuals are assumed to move independently from each other, randomly and passively between nodes. This event produces at change in the configuration of the whole system, affecting both location $i$ and $j$. The individual jumping rate, $\mu$, controls this transition rate:
+\begin{equation} 
+\label{Tu}
+T(n_1, \dots, n_i-1, \dots, n_j+1, \dots, n_M|n_1, \dots, n_i, \dots, n_j, \dots, n_M )  = \mu q_{ij}\,n_i
+\end{equation} 
+
+In our Gillespie framework, the total rate, $R$ in Eq (\ref{eq:R_M}), determines the distribution of interevent times between individual movement events. Here, we can use a hierarchical Gillespie algorithm where we first choose a location by sampling a discrete probability distribution, according to the different $R_i$'s, which measure the propensity for each location to undergo a change:
+\begin{equation}
+\left(\frac{R_1}{R}, \dots, \frac{R_M}{R}\right)
+\end{equation}
+where $M$ is the total number of nodes. Imagine we have chosen location $i$. Then, it means that that population looses one individual, i.e., it goes from $n_i$ to $n_i-1$. Where does this individual go? In a second step, we choose a location among the neighborhood of the focal one (see Box 2 for details on the hierarchical algorithm). If we have chosen $j$ as a second location, we should update accordingly the $j$-th population, which gains one individual, from $n_j$ to $n_j+1$. 
+\smallskip
+
+General network structures can also be implemented without much trouble. An ecological meaningful example assumes a network of nodes (or patches) at a given physical distance, $d_{ij} =|r_j -r_i|$, from each other. Although other dispersal kernels are possibile, we may assume that migration decays exponentially as the between-patch Euclidean distance increases, then a per-capita movement rate assigned to the directed edge from patch $i$ to patch $j$ can be defined as
+\begin{equation}
+\mu_{ij} = \mu_0 \, e^{-\lambda\,d_{ij}}. \nonumber
+\end{equation}
+In this case, the total rate given by Eq. (\ref{eq:R_M}) is now written as
+\begin{equation}
+R(t) = \sum_{i=1}^{M} \hat{\mu}\,(x_i) n(x_i;t),
+\label{eq:R_MM}
+\end{equation}
+where $\hat{\mu}\,(x_i)$ is defined ($\hat{\mu}_i$ for short) as the total per-capita rate of leaving node $i$, namely  
+\begin{equation}
+\hat{\mu}\,(x_i) = \sum_{j \in {\cal N}_i} \mu_{ij}.
+\end{equation}   
+
+If we assume each node occupies the same surface, $S$, we can also define a corresponding density or number of individuals per unit area:   
+\begin{equation}
+x_i \equiv \frac{n(r_i;t)}{S},
+\label{eq:x_i}
+\end{equation}
+
+For a square lattice of step size $L$, let us now use the alternative convention that $\mu$ is the rate \emph{per outgoing edge}. Thus, in the interior of a square lattice with four neighbors, the total departure rate is $4\mu n_i$, rather than $\mu n_i$. The evolution of the mean density is described exactly by the following linear equations (for deterministic initial conditions, or with $x_i$ interpreted as the mean density):
+\begin{equation}
+\frac{dx_i}{dt} = -\hat{\mu}_i\,x_i + \mu \, \sum_{j \in {\cal N}_i} x_j, 
+\end{equation}
+for $i=1, \dots, M$, where ${\cal N}_i$ is the set of nodes that are connected to the $i$-th node, the neighborhood of each node, and we see that 
+\begin{align*}
+\hat{\mu}_i   &= \sum_{j \in {\cal N}_i} \mu
+\end{align*} 
+\begin{align*}
+\hat{\mu}_i   &= \mathbf{card}({\cal N}_i)\, \mu
+\end{align*} 
+for $i=1, \dots, M$. Assuming a Von Neumann neighborhood, this can be simply written as
+\begin{equation}
+\frac{dx_i}{dt} = 4\,\mu \left(\frac{1}{4} \left[\sum_{j \in {\cal N}_i} x_j\right] - x_i\right)
+\end{equation}
+for $i=1, \dots, M$. This equation simply says that the rate of increase in the local density of individuals at a location, $r_i$, is proportional to the difference between the average density in a \emph{close} neighborhood around $r_i$, and the local density at that location. Notice that the factor $4\mu$ in the last expression multiplies the difference between the neighbor average and the local density; it is \emph{not} the continuum diffusion coefficient. Indeed, for a smooth spatial density $x(\mathbf r,t)$,
+\[
+\sum_{j\in\mathcal N_i}x_j-4x_i
+  =L^2\,\Delta x(\mathbf r_i,t)+O(L^4).
+\]
+Therefore, the corresponding continuum diffusion equation is
+\begin{equation}
+\frac{\partial x}{\partial t} = D\,\Delta x, \qquad D=\mu L^2,
+\label{eq:Diffusion}
+\end{equation}
+where $\Delta$ is the spatial Laplacian. To obtain a nonzero finite diffusion coefficient as $L\to0$, the edge-jumping rate must scale as $\mu=D/L^2$. If instead $\mu$ denotes the total departure rate and each of four neighbors is chosen with probability $1/4$, then $D=\mu L^2/4$. This distinction is important when comparing simulations with continuum reaction--diffusion equations.  
+\smallskip
+
+\subsubsection*{A stochastic reaction--diffusion model: a consumer feeding on a resource}
+To construct this spatial extension, we consider a consumer population that can be separated into distinct behavioral stages. Some individuals are in a searching state, moving through space while looking for resources. These searching consumers may disperse to other local populations at rate $\mu_C$. Once a searching individual encounters a resource item, a handling complex is formed and the individual ceases movement in order to process and digest the resource. After a handling period, the individual returns to the searching state. During handling, individuals are {\em energy rich} and can reproduce, generating additional searching individuals. 
+
+The natural idea of distinguishing between two types of individuals—those that move and those that reproduce but do not move—is introduced, by symmetry, into the resource dynamics as well. We assume that reproducing resource individuals are sessile (i.e., they do not move) and produce resource propagules at rate $\beta_R$. The propagules themselves disperse randomly to neighboring local populations at rate $\mu_R$ (denoted $\mu_P$ in the event table below). Thus, we also distinguish two resource types: reproducing individuals and dispersing individuals. These dispersing stages are referred to generically as propagules (e.g., seeds in plants or larvae in marine invertebrates), and they eventually establish at rate ($\eta_R$), with establishment modulated by the amount of empty space available in the local population. For completeness, we restate the reaction scheme for all processes occurring in a focal population, including the losses and gains of individuals due to random movement (see Table \ref{tab:consumer-resource-events}).
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.19}
+\begin{tabular}{@{}r p{0.34\linewidth} p{0.28\linewidth} l@{}}
+\hline
+No. & Elementary event & Reaction scheme & Rate parameter \\
+\hline
+1 & Out-dispersal of resource propagules & $ P_i \to P_j $ & $ \mu_P $ \refstepcounter{equation}\label{outPopagule} \\
+2 & In-dispersal of resource propagules & $ P_j \to P_i $ & $ \mu_P $ \refstepcounter{equation}\label{inPopagule} \\
+3 & Propagule death & $ P \to \emptyset $ & $ \delta_P $ \refstepcounter{equation}\label{PopaguleDeath} \\
+4 & Propagule production & $ R \to R+P $ & $ \beta_R $ \refstepcounter{equation}\label{Birth_P} \\
+5 & Propagule establishment & $ P+\emptyset \to R $ & $ \eta_R $ \refstepcounter{equation}\label{Establishment_P} \\
+6 & Resource death & $ R \to \emptyset $ & $ \delta_R $ \refstepcounter{equation}\label{Death_R} \\
+\hline
+7 & Out-dispersal of searching consumers & $ A_i \to A_j $ & $ \mu_C $ \refstepcounter{equation}\label{outSearching} \\
+8 & In-dispersal of searching consumers & $ A_j \to A_i $ & $ \mu_C $ \refstepcounter{equation}\label{inSearching} \\
+9 & Searching consumer death & $ A \to \emptyset $ & $ \delta_A $ \refstepcounter{equation}\label{Death_A} \\
+10 & Attack & $ A+R \to A_R+\emptyset $ & $ \alpha $ \refstepcounter{equation}\label{Attack} \\
+11 & Handling completion & $ A_R \to A $ & $ \nu $ \refstepcounter{equation}\label{Handling} \\
+12 & Consumer reproduction & $ A_R \to A_R+A $ & $ \beta_A $ \refstepcounter{equation}\label{Growth_A} \\
+13 & Handling consumer death & $ A_R \to \emptyset $ & $ \delta_A $ \refstepcounter{equation}\label{Death_AR} \\
+\hline
+\end{tabular}
+    \caption{Consumer feeding on a resource. Both species move over a network of local populations}
+    \label{tab:consumer-resource-events}
+\end{table}
+
+\noindent The in-dispersal rows (2 and 8) describe the receiving end of the same movement events represented in rows 1 and 7. They must not be counted as additional, independent stochastic events. The table lists the \emph{reaction schemes} and their kinetic parameters; the actual transition rates depend on the current numbers of individuals and, where appropriate, available space. For movement from node $i$ to $j$, the destination is selected according to the dispersal network. Equations below specify the propensities for a focal patch.
+
+
+Notice the symmetry of the reproduction process of both resources and consumers (see Eq (\ref{Growth_A}) and (\ref{Birth_P})). As explained before, for any out-dispersal event in a focal population there will be a in-dispersal event in a neighboring local population. Here we will prescribe to calculate the total rate of something happening in a focal local population by counting only the out-dispersal processes along with the rest of local processes. We will not count the in-dispersal processes, because these rates depend on the neighboring patches of the focal population and not on the focal patch itself. The state of every local population will be described by four integers $(k,n,m,l)$, where an additional $k$ represents here the number of propagules in that local population. The total rate for a local population to undergo a change of any kind, if it is in a given configuration, $\vec{n}=(k,n,m,l)$, will the sum of the following rates, as shown in table \ref{tab:Configuration-change rates}. 
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}r p{0.33\linewidth} p{0.35\linewidth} l@{}}
+\hline
+No. & Event & Change in focal state & Propensity \\
+\hline
+1 & Propagule dispersal (departure) & $(k,n,m,l)\to(k-1,n,m,l)$ & $\mu_P k$ \\
+3 & Propagule death & $(k,n,m,l)\to(k-1,n,m,l)$ & $\delta_P k$ \\
+4 & Propagule production & $(k,n,m,l)\to(k+1,n,m,l)$ & $\beta_R n$ \\
+5 & Propagule establishment & $(k,n,m,l)\to(k-1,n+1,m,l)$ & $\eta_R (1-n/N)k$ \\
+6 & Resource death & $(k,n,m,l)\to(k,n-1,m,l)$ & $\delta_R n$ \\
+7 & Consumer dispersal (departure) & $(k,n,m,l)\to(k,n,m-1,l)$ & $\mu_C m$ \\
+9 & Searching consumer death & $(k,n,m,l)\to(k,n,m-1,l)$ & $\delta_A m$ \\
+10 & Attack & $(k,n,m,l)\to(k,n-1,m-1,l+1)$ & $\alpha(n/N)m$ \\
+11 & Handling completion & $(k,n,m,l)\to(k,n,m+1,l-1)$ & $\nu l$ \\
+12 & Consumer reproduction & $(k,n,m,l)\to(k,n,m+1,l)$ & $\beta_A l$ \\
+13 & Handling consumer death & $(k,n,m,l)\to(k,n,m,l-1)$ & $\delta_A l$ \\
+\hline
+\end{tabular}
+\caption{Configurational changes and their corresponding probability rates or {\em propensities}}
+\label{tab:Configuration-change rates}
+\end{table}
+\noindent Here $k$, $n$, $m$, and $l$ denote resource propagules, established resources, searching consumers, and handling consumers, respectively. For departure events the simultaneous arrival in the selected destination patch is part of the \emph{same} global event. In particular, establishment consumes one propagule; this was omitted from one transition in the original list.
+  
+Using the notation already explained in a previous section, we may write the analogous expression for the total rate (see Eq (\ref{Rate})) for a given focal population in the configuration state $\vec{n}=(k,n,m,l)$ to undergo any change as:
+\begin{equation}
+R^j(\vec{n}) = \sum_{i\in\{1,3,4,5,6,7,9,10,11,12,13\}} R^{\textup{out}}_i(\vec{n}_j)
+\label{Rate_j}
+\end{equation}
+where here the superscript and subscipt $j$ emphasizes that this corresonds to the $j-th$ focal population belonging to a network of communities or metacommunity, with $j=1, \dots, M$. We remark also that the {\em in-disperal rates} number 2 and 8 are not considered. The reason is that they are linked to events that have an origin in a neighboring patch, whose rates will be considered when calculating the total rates of those neighboring patches. In that way, as explained in the previous section, the {\em grand} total rate associated to the whole $M$-patch system undergoing any change in any focal patch will safely be the sum of Eq (\ref{Rate_j}) over patches (without counting dispersal processes twice). This will be the {\em grand} total rate controlling the stochastic time, analogous to previous Eq (\ref{eq:R_M}):
+\begin{equation}
+  R(t) =  \sum_{j=1}^{M} R^j(\vec{n}_j)
+  \label{eq:RD_M}
+\end{equation}  
+ 
+An optimal implementation requires to store a matrix of changes in propensities $\mathbf{\Delta r}$ together with auxiliary dependency matrices $\mathbf A$ and $\mathbf T$ (see Appendix \ref{App:Optimization})
+
+\subsubsection*{The master equation}
+The transition rates control the temporal evolution of the probability that the system is in a given configuration, $\vec{n}=(k,n,m,l)$. On the one hand, we have already calculated the total rate at which the system leaves this state (see Eq (\ref{Rate})). On the other, we can also calculate the total rate at which the system falls in this state from other possible states. The balance between these two (in- and out-) overall processes control the evolution of the whole probability distribution $P(k,n,m,l; t)$. This can be represented by master equation of the system. In our example, we can write: 
+\begin{equation}
+	\frac{dP(\vec{n}; t)}{dt} = \sum_{i=1}^M R^{\textup{in}}_i(\vec{n}')P(\vec{n}';t) - R^{\textup{out}}(\vec{n})\,P(\vec{n}; t)
+	\label{eq:ME}
+\end{equation} 
+where $R^{\textup{out}}(\vec{n})$ is given by Eq (\ref{Rate}), but here the superscript  emphasizes it is the total out-rate from a general configuration $\vec{n}=(k,n,m,l)$. For every  transition rate in Eqs (\ref{T1})-(\ref{T7}), we can write the corresponding transition rate at which the system falls in that state ($\vec{n}=(n,m,l,k)$). This equation governs the temporal evolution of the probability that the system occupies the various configurations within a given local population, in the absence of diffusion.
+

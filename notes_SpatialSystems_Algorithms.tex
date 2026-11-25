@@ -1,0 +1,300 @@
+\subsection{Efficient simulation of spatially extended stochastic systems}
+\label{space}
+Our goal is to extend any model specified in well-mixed local population into a network of $M$ nodes. As an example, here each node will represent a local population undergoing the consumer-resource dynamics specified in the full reaction scheme given by Eqs (\ref{outPopagule})-(\ref{Death_AR}). In addition, there is the possibility of random movement of individuals between nodes. This extension will strongly emphasize the necessity of the optimization of the Gillespie algorithms we have introduced so far.   
+\smallskip
+   
+\subsection*{{\bfseries Stochastic diffusion}}   
+ We first introduce a simple stochastic model for a population diffusing on a discrete network where individuals can jump from node to node at a constant rate $\mu$. We consider a constant total population of $n_A$ individuals of a species $A$ distributed over a series of $M$ nodes. The set of nodes defines a metapopulation network where each node host a population at the spatial location $r_i$. We may use generic graphs to characterize the spatial network. The number of individuals in each node of the network at $r_i$ at time $t$ is given by $n(r_i;t)$ with $n \in [0, \dots, n_A]$, $i \in [1,\cdots,M]$, and $t \in \mathbb{R}$, where the total number of nodes is $M$.
+\smallskip
+
+Let us introduce a short notation to represent the number of individuals at every node $i$ at time $t$:
+\begin{equation}
+n_i \equiv n(r_i;t), \\
+\label{eq:R_M}
+\end{equation}
+for $i=1, \dots, M$, which fully determines the configuration of the system at any given time. 
+\smallskip
+
+The process is completely defined by the initial number of individuals in each site $n(r_i;0)$ ($i \in [1,\cdots,M]$), and the per capita movement rate of each individual into neighboring nodes as defined by the network topology. Assuming the same rate $\mu$ for every individual movement, the total rate of the process at time $t$ is given by
+\begin{equation}
+R(t) =  \mu \sum_{i=1}^{M}n(r_i;t) = \sum_{i=1}^{M} R(r_i;t) \equiv \sum_{i=1}^{M} R_i\\
+\label{eq:R_M}
+\end{equation}
+where we emphasize that $R_i$ is rate at which a given location $i$ change configuration as a result of an individual moving out from this location.  
+\smallskip
+
+In general, individual movements can be represented by: 
+\begin{eqnarray}
+A_i + \emptyset_j & \ch{->[ $\mu$ ]} &  \emptyset_i + A_j \label{Movement}
+\end{eqnarray}
+where an individual in node $i$ jumps into node $j$ leaving an empty set behind. However, this representation involves that jumps are allowed or not depending on the existence of enough room in the receiving node (empty sites within that node). In other words, if the receiving node if full, i.e., at carrying capacity, movement into it is forbidden. In what follows, for simplicity, we will not assume a carrying capacity for the species that move. In this case, individual movements can simply be represented by: 
+\begin{eqnarray}
+A_i  & \ch{->[ $\mu$ ]} &   A_j \label{Movement}
+\end{eqnarray}
+where here individuals are assumed to move independently from each other, randomly and passively between nodes. This event produces at change in the configuration of the whole system, affecting both location $i$ and $j$. The individual jumping rate, $\mu$, controls this transition rate:
+\begin{equation} 
+\label{Tu}
+T(n_1, \dots, n_i-1, \dots, n_j+1, \dots, n_M|n_1, \dots, n_i, \dots, n_j, \dots, n_M )  = \mu \,n_i
+\end{equation} 
+
+In our Gillespie framework, the total rate, $R$ in Eq (\ref{eq:R_M}), determines the distribution of interevent times between individual movement events. Here, we can use a hierarchical Gillespie algorithm where we first choose a location by sampling a discrete probability distribution, according to the different $R_i$'s, which measure the propensity for each location to undergo a change:
+\begin{equation}
+\left(\frac{R_1}{R}, \dots, \frac{R_M}{R}\right)
+\end{equation}
+where $M$ is the total number of nodes. Imagine we have chosen location $i$. Then, it means that that population looses one individual, i.e., it goes from $n_i$ to $n_i-1$. Where does this individual go? In a second step, we choose a location among the neighborhood of the focal one (see Box 2 for details on the hierarchical algorithm). If we have chosen $j$ as a second location, we should update accordingly the $j$-th population, which gains one individual, from $n_j$ to $n_j+1$. 
+\smallskip
+
+General network structures can also be implemented without much trouble. An ecological meaningful example assumes a network of nodes (or patches) at a given physical distance, $d_{ij} =|r_j -r_i|$, from each other. Although other dispersal kernels are possibile, we may assume that migration decays exponentially as the between-patch Euclidean distance increases, then the per capita movement rate between patch $i$ and $j$ is defined as
+\begin{equation}
+\mu_{ij} = \mu_0 \, e^{-\lambda\,d_{ij}}. \nonumber
+\end{equation}
+In this case, the total rate given by Eq. (\ref{eq:R_M}) is now written as
+\begin{equation}
+R(t) = \sum_{i=1}^{M} \hat{\mu}\,(x_i) n(x_i;t),
+\label{eq:R_MM}
+\end{equation}
+where $\hat{\mu}\,(x_i)$ is defined ($\hat{\mu}_i$ for short), analogously, as  
+\begin{equation}
+\hat{\mu}\,(x_i) = \sum_{j \in {\cal N}_i} \mu_{ij}.
+\end{equation}   
+
+If we assume each node occupies the same surface, $S$, we can also define a corresponding density or number of individuals per unit area:   
+\begin{equation}
+x_i \equiv \frac{n(r_i;t)}{S}, \\
+\label{eq:x_i}
+\end{equation}
+
+In addition, if we assume a square lattice of step size, $L$, in the limit of continuum densities, we can describe the temporal dynamics of the system as the following coupled ODE system:
+\begin{equation}
+\frac{dx_i}{dt} = -\hat{\mu}_i\,x_i + \mu \, \sum_{j \in {\cal N}_i} x_j, 
+\end{equation}
+for $i=1, \dots, M$, where ${\cal N}_i$ is the set of nodes that are connected to the $i$-th node, the neighborhood of each node, and we see that 
+\begin{align*}
+\hat{\mu}_i   &= \sum_{j \in {\cal N}_i} \mu
+\end{align*} 
+\begin{align*}
+\hat{\mu}_i   &= \mathbf{card}({\cal N}_i)\, \mu
+\end{align*} 
+for $i=1, \dots, M$. Assuming a Von Neumann neighborhood, this can be simply written as
+\begin{equation}
+\frac{dx_i}{dt} = 4\,\mu \left(\frac{1}{4} \left[\sum_{j \in {\cal N}_i} x_j\right] - x_i\right)
+\end{equation}
+for $i=1, \dots, M$. This equation simply says that the rate of increase in the local density of individuals at a location, $r_i$, is proportional to the difference between the average density in a \emph{close} neighborhood around $r_i$, and the local density at that location. Therefore, the definition of $\mu$ as a per capita random movement rate between patches ensures that the discrete model on a regular square lattice and Von Neumann neighborhoods converges to the diffusion equation in the continuum limit, in the limit of the lattice step size, $L$, tending to zero:
+\begin{equation}
+\frac{\partial x}{\partial t} = 4\, \mu \, \Delta x
+\label{eq:Diffusion}
+\end{equation}
+where $x$ correponds to the density of individuals at the spatial location $r$ at any given time $t$, $\mu$ is the jumping rate, and $\Delta$ is the Laplacian operator.  
+\smallskip
+
+\subsubsection*{{\bfseries The Stochastic Reaction-Diffusion Extended Model: \\ A consumer feeding on logistic-growing resource}}
+In the order to make this spatial extension, we will consider that searching individuals may move. They may disperse to other local populations at a given rate $\mu_C$. Handling individuals, the ones that reproduce and give rise to searching individuals, will not move. The sensible idea of considering two types of individuals, they ones that move and they ones that reproduce but not move, will be introduced, by symmetry, into the dynamics of the resource population. We will consider that resource reproducing individuals are sessile (they don't move), and produce resource propagules at rate $\beta_R$, while individual propagules do disperse randomly to neighboring local populations, at a rate $\mu_R$. Therefore, symmetrically, we also consider two types of resource individuals, the reproducing and the dispersing ones. Propagules will get eventually established at a rate ($\eta_R$), a process that will be modulated by the amount of empty space in that local population. For completeness, we re-write here the reaction scheme for all the processes involved on a given focal population including the loss and gain of individuals through random movements:   
+\begin{enumerate}
+	\item \bfseries{Out-dispersal of resource propagules from the local population}
+	\begin{eqnarray}
+	P  & \ch{->[ $\mu_P$ ]} & \emptyset \label{outPopagule}
+	\end{eqnarray}
+	\item \bfseries{In-dispersal of resource propagules into the local population}
+	\begin{eqnarray}
+	\emptyset  & \ch{->[ $\mu_P$ ]} & P \label{inPopagule}
+	\end{eqnarray}
+	\item \bfseries{Propagule Death}
+	\begin{eqnarray}
+	P   & \ch{->[ $\delta_P$ ]} & \emptyset \label{PopaguleDeath}
+	\end{eqnarray}
+	\item \bfseries{Propapule production}
+	\begin{eqnarray}
+	 R & \ch{->[ $\beta_R$ ]} & R + P \label{Birth_P}
+	\end{eqnarray}
+	\item \bfseries{Propapule establishment}
+	\begin{eqnarray}
+	P + \emptyset & \ch{->[ $\eta_R$ ]} & R \label{Establishment_P}
+	\end{eqnarray}		
+	\item \bfseries{Death of resources}
+	\begin{eqnarray}
+	R  & \ch{->[ $\delta_R$ ]} & \emptyset \label{Death_R}
+	\end{eqnarray}
+	\item \bfseries{Out-dispersal of searching individuals from the local population}
+	\begin{eqnarray}
+	A  & \ch{->[ $\mu_C$ ]} & \emptyset \label{outSearching}
+	\end{eqnarray}
+	\item \bfseries{In-dispersal of searching individuals into the local population}
+	\begin{eqnarray}
+	\emptyset  & \ch{->[ $\mu_C$ ]} & A \label{inSearching}
+	\end{eqnarray}
+	\item \bfseries{Death of searching consumers}
+	\begin{eqnarray}
+	A  & \ch{->[ $\delta_A$ ]} & \emptyset \label{Death_A}
+	\end{eqnarray}
+	\item \bfseries{Attack}
+	\begin{eqnarray}
+	A + R  & \ch{->[ $\alpha$ ]} & A_R + \emptyset \label{Attack}
+	\end{eqnarray}
+	\item \bfseries{Handling}
+	\begin{eqnarray}
+	A_R  & \ch{->[ $\nu$ ]} & A \label{Handling}
+	\end{eqnarray}
+	\item \bfseries{Growth of consumers}
+	\begin{eqnarray}
+	A_R  & \ch{->[ $\beta_A$ ]} & A_R + A \label{Growth_A}
+	\end{eqnarray}
+	\item \bfseries{Death of handling consumers}
+	\begin{eqnarray}
+	A_R  & \ch{->[ $\delta_A$ ]} & \emptyset \label{Death_AR}
+	\end{eqnarray}
+\end{enumerate}
+
+Notice the symmetry of the reproduction process of both resources and consumers (see Eq (\ref{Growth_A}) and (\ref{Birth_P})). As explained before, for any out-dispersal event in a focal population there will be a in-dispersal event in a neighboring local population. Here we will prescribe to calculate the total rate of something happening in a focal local population by counting only the out-dispersal processes along with the rest of local processes. We will not count the in-dispersal processes, because these rates depend on the neighboring patches of the focal population and not on the focal patch itself. The state of every local population will be described by four integers $(k,n,m,l,)$, where an additional $k$ represents here the number of propagules in that local population. The total rate for a local population to undergo a change of any kind, if it is in a given configuration, $\vec{n}=(k,n,m,l,)$, will the sum of the following rates:
+\begin{equation}
+\begin{array}{ccccc}
+R^{\textup{out}}_1(\vec{n})    &=& T(k-1,n,m,l | n,k,m,l)     &=& \mu_P\,k                   \\
+R^{\textup{out}}_3(\vec{n})    &=& T(k-1,n,m,l | n,k,m,l)     &=& \delta_P\,k                \\	
+R^{\textup{out}}_4(\vec{n})    &=& T(k+1,n,m,l | n,k,m,l)     &=& \beta_R\,n                 \\
+R^{\textup{out}}_5(\vec{n})    &=& T(k,n+1,m,l | n,k,m,l)     &=& \eta_R\,(1-\frac{n}{N})\,k \\
+R^{\textup{out}}_6(\vec{n})    &=& T(k,n-1,m,l | n,k,m,l)     &=& \delta_R\,n                \\
+R^{\textup{out}}_7(\vec{n})    &=& T(k,n,m-1,l | n,k,m,l)     &=& \mu_C\,\,m                 \\
+R^{\textup{out}}_9(\vec{n})    &=& T(k,n,m-1,l | n,k,m,l)     &=& \delta_C \,m               \\
+R^{\textup{out}}_{10}(\vec{n}) &=& T(k,n-1,m-1,l+1 | n,k,m,l) &=& \alpha\,\frac{n}{N}\,m     \\
+R^{\textup{out}}_{11}(\vec{n}) &=& T(k,n,m+1,l-1 | n,k,m,l)   &=& \nu \,l                    \\
+R^{\textup{out}}_{12}(\vec{n}) &=& T(k,n,m+1,l | n,k,m,l)     &=& \beta_C \,l                \\
+R^{\textup{out}}_{13}(\vec{n}) &=& T(k,n,m,l-1 | n,m,l)       &=& \delta_C \,l
+\end{array}	
+\end{equation}  
+where we use notation already explained in a previous section. Therefore, we may write the analogous expression for the total rate (see Eq (\ref{Rate})) for a given focal population in the configuration state $\vec{n}=(k,n,m,l,)$ to undergo any change as:
+\begin{equation}
+R^j(\vec{n}) = \sum_{i=1, i \not= 2, i \not= 8}^{12} R^{\textup{out}}_i(\vec{n}_j)
+\label{Rate_j}
+\end{equation}
+where here the superscript and subscipt $j$ emphasizes that this corresonds to the $j-th$ focal population belonging to a network of communities or metacommunity, with $j=1, \dots, M$. We remark also that the {\em in-disperal rates} number 2 and 8 are not considered. The reason is that they are linked to events that have an origin in a neighboring patch, whose rates will be considered when calculating the total rates of those neighboring patches. In that way, as explained in the previous section, the {\em grand} total rate associated to the whole $M$-patch system undergoing any change in any focal patch will safely be the sum of Eq (\ref{Rate_j}) over patches (without counting dispersal processes twice). This will be the {\em grand} total rate controlling the stochastic time, analogous to previous Eq (\ref{eq:R_M}):
+\begin{equation}
+  R(t) =  \sum_{j=1}^{M} R^j(\vec{n}_j)\\
+  \label{eq:RD_M}
+\end{equation}  
+ 
+The production of stochastic realizations of this reaction-diffusion system requires the optimization strategy described before, which calls for the calculation of the ${\bf \Delta r}$ matrix along with the ${\bf A}$ and ${\bf T}$ auxiliary matrices. These are given in order:  
+
+\begin{equation}
+{\bf T} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc}
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+\hline
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 1 & 1 & 1  & 0 & 0 & 0  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 1 & 1 & 1  & 0 & 0 & 0  & 1 & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0  & 1 & 1 & 1  & 1 & 0 & 1  & 1 & 1 & 1 & 1 \\
+0 & 0 & 0  & 0 & 1 & 0  & 1 & 0 & 1  & 1 & 1 & 1 & 1 \\
+0 & 0 & 0  & 0 & 1 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 1 & 1 & 1 \\
+\end{array}
+\right]
+\label{T_E}
+\end{equation}
+
+As you can see, the second and the eighth column are identically zero because they correspond to changes in immigration rates from neighboring local populations due an event happening in the focal population. Any change on the focal population cannot have any influence on the propensity of individuals from neighboring local populations to immigrate into the focal population. However, the second and the eighth rows are not zero because they represent the impact of the new incoming immigrant on the rates controlling the events in the focal population.  
+
+\begin{equation}
+{\bf A} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc||c}
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+\hline
+1 & 3 & 5   & 0  & 0 & 0   & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 4   & 5  & 6 & 10  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 6\\
+4 & 5 & 6   & 10 & 0 & 0   & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 4\\
+\hline
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+\hline
+4  & 5  & 6   & 7  & 9  & 10  & 11 & 12 & 13  & 0 & 0 & 0 & 0 & 9\\
+7  & 9  & 10  & 11 & 12 & 13  & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 6\\
+7  & 9  & 10  & 0  & 0  & 0   & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 3\\
+11 & 12 & 13  & 0  & 0  & 0   & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 3\\
+\end{array}
+\right]
+\label{A_E}
+\end{equation}
+
+They are, on average, 4 rates that are changed as a result of an event happening in the focal population. We expect, on average, a 4/13 reduction factor in computation time with respect a naive algorithm that calculated the total 13 new rates from scratch after the realization of an event. In addition, when an event occurs in a patch, which does not involve movement of individuals, only the rates in that patch change. If the occurring event is the 1 or the 7, which involve movement of propagules or searching individuals, respectively, then both the rates of that focal patch and the rates of the patch receiving immigrants may be affected, which again leaves the rates in all the other patches totally unchanged. This will involve a tremendous gain in computational time. As $M$ increases, a straightforward algorithm that naively updated the total rate over the whole $M$-patch system from scratch after the occurrence of any event will be computationally unaffordable.   
+  
+\begin{center}
+\begin{sideways}
+\begin{minipage}{\textheight}
+\begin{equation}
+{\bf \Delta r} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc}
+-\mu_P & 0 & -\delta_P   & 0 & -\eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+ \mu_P & 0 &  \delta_P   & 0 &  \eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+-\mu_P & 0 & -\delta_P   & 0 & -\eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+\hline
+ \mu_P & 0  &  \delta_P   & 0        & \eta_R\,\frac{N-n'}{N}          & 0          & 0 & 0 & 0  & 0                   & 0 & 0 & 0  \\
+-\mu_P & 0  & -\delta_P   &  \beta_R & -\frac{\eta_R}{N}(1+k'+(N-n'))  &  \delta_R  & 0 & 0 & 0  & \alpha\frac{m'}{N}  & 0 & 0 & 0 \\
+ 0     & 0  &  0          & -\beta_R & \eta_R\,\frac{k'}{N}            & -\delta_R  & 0 & 0 & 0  & -\alpha\frac{m'}{N} & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0                 & 0 & 0 & 0                                              & -\mu_A & 0 & -\delta_A     & -\alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     &  \alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+0 & 0 & 0                 & 0 & 0 & 0                                              & -\mu_A & 0 &  -\delta_A     & -\alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+\hline
+0 & 0 & 0                 & -\beta_R & \eta_R\frac{k'}{N}              & -\delta_R   & -\mu_A & 0 & -\delta_A     & -\frac{\alpha}{N}(1+n'+m') &  \nu &  \beta_A &  \delta_A  \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     & \alpha\,\frac{n'}{N}        & -\nu & -\beta_A & -\delta_A  \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     & \alpha\,\frac{n'}{N}        &  0   &  0       &  0         \\
+0 & 0 & 0                 & 0 & 0 & 0                                              & 0      & 0 &  0            & 0                          & -\nu & -\beta_A & -\delta_A  \\
+\end{array}
+\right]
+\label{Delta_E}
+\end{equation}
+\end{minipage}
+\end{sideways}
+\end{center}
+
+\subsubsection*{The master equation and the macroscopic law}
+The transition rates control the temporal evolution of the probability that the system is in a given configuration, $(n,m,l,k)$. On the one hand, we have already calculated the total rate at which the system leaves this state (see Eq (\ref{Rate})). On the other, we can also calculate the total rate at which the system falls in this state from other possible states. The balance between these two (in- and out-) overall processes control the evolution of the whole probability distribution $P(n,m,l,k; t)$. This can be represented by master equation of the system. In our example, we can write: 
+\begin{equation}
+	\frac{dP(\vec{n}; t)}{dt} = \sum_{i=1}^m R^{\textup{in}}_i(\vec{n}')P(\vec{n}';t) - R^{\textup{out}}(\vec{n})\,P(\vec{n}; t)
+	\label{eq:ME}
+\end{equation} 
+where $R^{\textup{out}}(\vec{n})$ is given by Eq (\ref{Rate}), but here the superscript  emphasizes it is the total out-rate from a general configuration $\vec{n}=(n,m,l,k)$. For every  transition rate in Eqs (\ref{T1})-(\ref{T7}), we can write the corresponding transition rate at which the system falls in that state ($\vec{n}=(n,m,l,k)$). This equation governs the temporal evolution of the probability that the system occupies the various configurations within a given local population, in the absence of diffusion..
+
+We also give the macroscopic law for the dynamics of this model on a single patch, which we analyze and compare to that of the basic model in the next section. We use the same prescriptions and definitions as we did for the basic model represented by Eqs (\ref{eq:x})-(\ref{eq:z}):
+\begin{eqnarray}
+\label{eq:ww}
+\frac{dw}{d\tau}   & = & -d_P \,w + b_R\,x - e_R\,(1-x)\,w \\
+\label{eq:xx}
+\frac{dx}{d\tau}   & = & -d_R \,x + e_R\,(1-x)\,w -a\,x\,y \\
+\label{eq:yy}
+\frac{dy}{d\tau}   & = & -d_C \,y + u\,z + b_C\,z -a\,x\,y \\
+\label{eq:zz}
+\frac{dz}{d\tau}   & = & -d_C \,z + a\,x\,y -u\,z 
+\end{eqnarray}
+where again $d_R$ is equal to one by definition, and $e_R=\eta_R/\delta_R$, and $d_P = \delta_P/\delta_R$ are new dimensionless parameters, the establishment rate, and the propagule death rate, respectively. The rest of dimensionless parameters have been already defined. Interestingly, as we will see, the fixed points of this extended model, when considered only on one single patch, can be formally re-written in the same way as the ones for the basic model. Not surprisingly, both models show the same qualitative dynamics with some interesting differences we highlight in the next section. Assuming a Von Neumann neighborhood on a grid from $i=1$ to $M$ nodes, the deterministic analog of the stochastic spatially extended system is decribed by: 
+\begin{eqnarray}
+\label{eq:wwsd}
+\frac{dw_i}{d\tau}   & = & -d_P \,w_i + b_R\,x_i - e_R\,(1-x_i)\,w_i + 4\,m_R \left(\frac{1}{4} \left[\sum_{j \in {\cal N}_i} w_j\right] - w_i\right)\\
+\label{eq:xxsd}
+\frac{dx_i}{d\tau}   & = & -d_R \,x_i + e_R\,(1-x_i)\,w_i -a\,x_i\,y_i \\
+\label{eq:yysd}
+\frac{dy_i}{d\tau}   & = & -d_C \,y_i + u\,z_i + b_C\,z_i -a\,x_i\,y_i + 4\,m_C \left(\frac{1}{4} \left[\sum_{j \in {\cal N}_i} y_j\right] - y_i\right)\\
+\label{eq:zzsd}
+\frac{dz_i}{d\tau}   & = & -d_C \,z_i + a\,x_i\,y_i -u\,z_i 
+\end{eqnarray}
+
+Finally, in clear analogy to the diffusion equation (Eq (\ref{eq:Diffusion})), the continuum limit of this extended model reads: 
+\begin{eqnarray}
+\label{eq:wws}
+\frac{dw}{d\tau}   & = & -d_P \,w + b_R\,x - e_R\,(1-x)\,w + 4\,m_R \, \Delta w\\
+\label{eq:xxs}
+\frac{dx}{d\tau}   & = & -d_R \,x + e_R\,(1-x)\,w -a\,x\,y \\
+\label{eq:yys}
+\frac{dy}{d\tau}   & = & -d_C \,y + u\,z + b_C\,z -a\,x\,y + 4\, m_C \, \Delta y\\
+\label{eq:zzs}
+\frac{dz}{d\tau}   & = & -d_C \,z + a\,x\,y -u\,z 
+\end{eqnarray}
+where $m_C \equiv \mu_C/\delta_R$ and $m_R \equiv \mu_R/\delta_R$ are dimensionless diffusion constants. The stability analysis of the full reaction-diffusion system is an interesting question on its own to be addressed in future work.  

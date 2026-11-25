@@ -1,0 +1,161 @@
+\section{Master equations and stationary distributions}
+\label{MEq_Approach}
+We focus now on general one-step stochastic process in continuous time. These processes ---also known as birth-death processes--- are a special class of Markov processes with many applications in Physics, Chemistry and Biology \citep{vanKampen92}. Interesting applications can be also found across biomedical sciences and engineering. 
+\smallskip
+
+The application of these types of stochastic processes to population biology started long time ago. The seminal paper by \citet{Kendall1948Logseries} can be considered the starting point. In Kendall's work, the main mathematical concepts discussed in this section are already used: the master equation (section \ref{master_equation}) ---which did not receive such a name until later \citep{vanKampen92}, the equation for the probability generating function (section \ref{master_equation}), and the search for stationary states (section \ref{stationary_distribution}). A review of early achievements in the application of this formalism to different problems in ecology and epidemiology can be found in \citet{Barlett60}.
+\smallskip
+
+In the last decades, particularly after the publication of Hubbell's book (\citeyear{Hubbell01}) on a neutral theory for biodiversity, this formalism has been used to build a strong theoretical foundation for population and community ecology. On the one hand, it represents an extension of classical deterministic approaches. On the other hand, it emphasizes the natural continuous flow of time and the essential discreteness of individuals and ecological events, such as birth, death, and immigration events. In addition, unlike complicated individual-based stochastic simulations, models based on this kind of stochastic processes are usually amenable to mathematical analysis, which provides complementary insights to those obtained by using the deterministic approach. Here we also insist on the importance of both deterministic and stochastic approach in modeling biological populations \citep{Nisbet82,Renshaw91}. 
+\smallskip
+
+In this section, we present a general derivation of the master equation based on the idea of statistical ensemble, as well as the general expression for the stationary distribution in terms of elemental transition rates. In the next section, we will also introduce the basic idea underlying the Gillespie algorithm, which generates exact sample trajectories of the stochastic temporal dynamics of a given system. Throughout all these sections, we present the theoretical material through simple examples.
+
+\subsection{The idea of statistical ensemble}
+\label{master_equation}
+Biologists are used to design experiments in which several replicates of the experimental system under study are set up. Although replicates are assumed to be identical or, at least, interchangeable, each of them may yield slightly different results. The output of a replicated experiment is always given in terms of the distribution of certain measured variables across replicates. By contrast, physicists are very familiar with thought experiments. Suppose our system is a biological population represented by $n_0$ individuals at at a given time $t_0$. Assume now, just mentally, a large number of identical and independent replicates of this system, all of them containing exactly $n_0$ individuals at at a given time $t_0$. This set of ideal replicates is called {\em statistical ensemble}\footnote{This theoretical idea is a powerful tool in statistical mechanics}. If there are dynamic processes affecting the number of individuals in the population, after some time, each replica will have evolved independently and show different population numbers. Here, we build a set of equations to study the temporal evolution of the whole ensemble \citep{Allen87}. 
+\smallskip
+
+One-dimensional, one-step processes apply to systems whose state at any given time $t$ is totally determined by an integer $n$. They are fully defined by the probabilities of increasing or decreasing this number in a small time interval, $dt$:
+\begin{eqnarray}
+    \Pb\{ n \longrightarrow n+1 \} & = & g_n dt \nonumber\\
+    \Pb\{ n \longrightarrow n-1 \} & = & r_n dt
+\label{eq:pb}
+\end{eqnarray}
+where $g_n$ and $r_n$ are called transition rates. 
+\smallskip
+
+We note by $\Omega$ the total number of replicas in our ensemble. At the initial time ($t=0$, for convenience), all our replicas are identical. They are copies of our biological population and all of them are represented by $n_0$ individuals. If we note by $\Omega(n,t)$ the number of replicas with $n$ individuals at time $t$, then the initial condition can be written as $\Omega(n_0,0)=\Omega$. Our goal is to trace the temporal evolution of this number, $\Omega(n,t)$, for $n=0, \dots, \infty$. If we wait for a small time interval, the number of systems in each category changes according to probabilities given above (see Eqs \ref{eq:pb}):
+\begin{eqnarray}
+\Omega(n,t+dt) \,\, = \,\, \Omega(n,t)  & + & g_{n-1} dt \Omega(n-1,t) \,\, + \,\, r_{n+1} dt \Omega(n+1,t) \nonumber \\
+& - & g_n dt \Omega(n,t) \,\, - \,\,r_n dt \Omega(n,t)                  \nonumber \\
+\textup{for} \,\, n > 0,      &
+&                                                                       \nonumber\\       
+\textup{and for} \,\, n = 0,  &   &                                                                       \nonumber \\
+\Omega(0,t+dt) \,\, = \,\, \Omega(0,t)  & + & r_1 dt \Omega(1,t) \,\, - \,\, g_0 dt \Omega(0,t)             
+\end{eqnarray}
+The rate of change in the number of systems in each category can be then written as:
+\begin{eqnarray}
+\frac{\Omega(n,t+dt) - \Omega(n,t)}{dt} & = & g_{n-1} \Omega(n-1,t) \,\, + \,\, r_{n+1} \Omega(n+1,t) \nonumber \\
+& - & g_n \Omega(n,t) \,\, - \,\, r_n  \Omega(n,t)            \nonumber \\
+\textup{for} \,\, n > 0,                &   &                                                         \nonumber \\        
+\textup{and for} \,\, n = 0,            &   &                                                         \nonumber \\
+\frac{\Omega(0,t+dt) - \Omega(0,t)}{dt} & = & r_1  \Omega(1,t) \,\, - \,\, g_0 \Omega(0,t)             
+\end{eqnarray}
+In addition, as $dt \rightarrow 0$, the left hand sides of the last equations above become derivatives with respect to time, and, as we argued for the particular case of the Poisson counting process in section 1 on % \ref{subsection:Poisson_Process}, 
+counting Poisson processes, we can use that the probability of having the system in the $n$ category at time $t$ is the fraction of systems in the $n$ category divided by the total number of systems in the ensemble when this number is very large:
+\begin{equation}
+P(n, t) = \lim_{\Omega \rightarrow \infty} \frac{\Omega(n,t)}{\Omega} 
+\end{equation}
+which allows to express the temporal evolution of the probabilities of having the system at each $n$ category as a system of ODEs:
+\begin{align}
+\frac{dP(n,t)}{dt} &=    g_{n-1} P(n-1,t) \,\, + \,\, r_{n+1} P(n+1,t) &                 \nonumber \\
+                   &    - (g_n + r_n )\,P(n,t)              & \textup{for} \,\, n > 0    \nonumber \\
+\frac{dP(0,t)}{dt} &=  r_1 P(1,t) \,\, - \,\, g_0 P(0,t)    & \textup{for} \,\, n=0 \label{me_1}
+\end{align}
+This system of ODEs is formally named {\em the master equation}. 
+
+\subsection{An equation for the probability generating function}
+Solving the master equation for $P(n,t)$ directly is difficult if not impossible in general. Closed-form solutions are available only in certain simple cases (see section on the counting Poisson process). More generally, one-step processes whose rates $g_n$ and $r_n$ are linear in $n$ can be solved through the probability generating function, $G(x,t)$, associated to the distribution $P(n,t)$ \citep{Barlett60}:
+\begin{equation}
+G(x,t) = \sum_{n=0}^{\infty} P(n,t) x^n
+\end{equation}
+First we need an equation for $G(x,t)$. This can be obtained from the master equation, Eq. (\ref{me_1}), by multiplying each ODE in the set by its corresponding factor $x^n$ and summing the resulting equations. As an example, let us consider the Yule process, which is defined by the following probability rates:
+\begin{align*}
+g_n & = \beta n\\
+r_n & = 0
+\end{align*}
+This process could represent, for instance, a bacterial population in exponential growth where cells constantly divide at rate $\beta$, and have a negligible probability of dying. Equation (\ref{me_1}) can be written in this case with no terms in $r_n$:    
+\begin{eqnarray}
+\frac{dP(n,t)}{dt}            & = & \beta (n-1) P(n-1,t) - \beta n P(n,t)         \nonumber \\
+\textup{for} \,\, n > 0,      &   &                                               \label{eq:Yule}
+\end{eqnarray}
+Notice that the equation in $n=0$ is trivial. If we take as the initial condition a population with only one cell, $P(0,t) = 0$ for any later time $t$ since there are no deaths. This initial condition can be expressed in terms of the probability distribution, $P(1,0)=1$ and $P(n,0)=0$ for any $n \not = 1$, as well as in terms of the corresponding probability generating function, $G(x,0) = P(1,0) x = x$. Additionally, normalization requires $G(1,t) = 1$ for any time $t$. Therefore, by summing ODEs in the system given by Eqs. (\ref{eq:Yule}) after multiplying each of them by the corresponding factor $x^n$, we obtain:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial t} = \sum_{n=1}^{\infty} \beta (n-1) x^n P(n-1,t) - \sum_{n=1}^{\infty} \beta n x^n P(n,t)
+\end{equation}
+Notice that the last equation can be written as:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial t} = \beta x^2 \sum_{m=1}^{\infty} m x^{(m-1)} P(m,t) - \beta x \sum_{n=1}^{\infty}n x^{(n-1)} P(n,t)
+\end{equation}
+Since we have that:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial x} = \sum_{n=1} n x^{(n-1)} P(n,t)
+\end{equation}
+we arrive to a quite simple equation for the probability generating function:
+\begin{equation}
+\label{eq:GenYule}
+\frac{\partial G(x,t)}{\partial t} = \beta x (x-1) \frac{\partial G(x,t)}{\partial x}
+\end{equation}
+This partial differential equation can be solved\footnote{This kind of partial differential equations are solved through the method of characteristics. This was not shown in class and it is beyond the scope of our introductory lessons.} to give rise to the following solution:
+\begin{equation}
+G(x,t) = \frac{x \, e^{-\beta t}}{1 - (1 -e^{-\beta t})x}
+\end{equation}
+Finally, we remark that this is the probability generating function for a geometric distribution of parameter $p=e^{-\beta t}$, being $q=1-e^{-\beta t}$, this is, we conclude that, if the initial population size is just 1, the probability of finding $n$ descendant individuals after a time $t$ is given by:
+\begin{equation}
+P(n,t) = p q^{n-1} = e^{-\beta t} \, (1 - e^{-\beta t})^{n-1}
+\end{equation}
+
+\subsection{The stationary distribution}
+\label{stationary_distribution}
+We are interested in finding a stationary state for a general one-step stochastic process governed by Eq. (\ref{me_1}) given a particular definition of the transition rates, $g_n$ and $r_n$. The stationary state is defined as the state in which $P(n, t)$ is time independent. We denote it by $P_s(n)$. If we set $dP(n,t)/dt=0$ in Eq. (\ref{me_1}), we obtain the following set of equations:
+\begin{eqnarray}
+\label{seq_n}
+0 & = & r_{n+1} P_s(n+1) - g_n P_s(n) - (r_n P_s(n) - g_{n-1} P_s(n-1))\,, \\
+&\vdots& \nonumber\\
+\label{seq_0}
+0 & = & r_{1} P_s(1) - g_0 P_s(0)\,.
+\end{eqnarray}
+Eq (\ref{seq_n}) implies that $r_n P_s(n) - g_{n-1} P_s(n-1) = J$ for any $n \ge 1$, where $J$ is a constant. However, by looking at the equation for $n=0$, we observe that $r_{1} P_s(1) - g_0 P_s(0) = 0$, which can be used in the equation for $n=1$ to show that $J = 0$, and, therefore 
+\begin{align}
+P_s(n) &= \frac{g_{n-1}}{r_n} P_s(n-1)\nonumber\\
+   n =1&,...,N     
+\label{balance}
+\end{align}
+Provided a normalizable stationary distribution exists, the recurrence gives: 
+\begin{align}
+P_s(n)      &= \frac{g_{n-1}\, g_{n-2} ...\, g_0}{r_n\, r_{n-1} ...\, r_1} P_s(0)\nonumber\\
+        n =1&,...,N    
+\label{P_stationary}
+\end{align}
+where the constant factor $P_s(0)$ can be determined from the normalization condition
+\begin{equation}
+\sum_{n=0}^N P_s(n) = P_s(0) + \sum_{n>0} P_s(n) = 1\, :
+\label{Norma}
+\end{equation}
+\begin{equation}
+(P_s(0))^{-1} = 1 + \sum_{n=1}^{N} \frac{g_{n-1}\, g_{n-2} ...\, g_0}{r_n\, 
+	r_{n-1} ...\, r_1}\, .  
+\label{inversionPs(0)}
+\end{equation}
+
+\subsubsection{The Immigration-Death Process: Stochastic Dynamics}
+\label{Immigration-Death-Process}
+Suppose you have an island with a certain number of individuals, $n$. The probability a new individual arriving to the island in time $dt$ is given by $\Pb[n \rightarrow n+1] = \lambda\ dt$. The probability of loosing one single individual to death in time $dt$ is just $mu\,dt$. If you have $n$ individuals, the probability of observing a population decrease in one individual (though the death of any of the $n$ possible candidates $n$) will dependent on the current number of individuals and is given by $\Pb[n \rightarrow n -1] = \mu\ n\ dt$. By accounting, we have the following differential equations for the probability distribution describing $n$:
+%\vicente{In the following text, I took the liberty of adding command "limits" to command "sum" to make it prettier (see ..."it must satisfy..."}
+\begin{align}
+	\frac{dP(n,t)}{dt}	&= \lambda P(n-1, t) - \lambda P(n, t) - \mu n P(n, t) + \mu (n + 1) P(n+1, t) \\
+    					&= \lambda P(n-1, t) + \mu( n + 1) P(n+1, t) - (\lambda + \mu\ n) P(n,t) \label{Immigration_Death_Eq}\\
+\intertext{While hard to find a close form solution, we are able to find a stationary probability distribution.}
+	\frac{dP(n,t)}{dt}	&= \lambda P(n-1, t) - \mu n P(n,t) - (\lambda P(n, t) - \mu(n+1) P(n+1,t)) \\
+\intertext{Assuming the system is at steady state (*), we then have}
+    P^*(n) &= \frac{\lambda}{\mu n} P^*(n-1) \\
+    P^*(n) &= \frac{\lambda}{\mu n}\frac{\lambda}{\mu(n-1)}P^*(n-2) \\    
+    		 &\vdots \\
+    P^*(n) &= \left(\frac{\lambda}{\mu}\right)^n \frac{1}{n!} P_0 \\
+\intertext{Since $P(n)$ describes a probability distribution, it must satisfy $\sum\limits_{n=0}^{\infty} P^*(n) = 1$. Thus, it follows that }
+	P_0 &= \frac{1}{\sum\limits_{n=0}^{\infty}\left(\frac{\lambda}{\mu}\right)^n \frac{1}{n!}}.
+\intertext{Recall that $\sum\limits_{n=0}^{\infty} \frac{1}{n!} x^n = e^x$, so we recover }
+	P^*(n) &= \left(\frac{\lambda}{\mu}\right)^n \frac{1}{n!} e^{-\lambda/\mu}
+\intertext{This is a Poisson stationary distribution with mean $\lambda/\mu$. It must not be confused with the Poisson counting process introduced earlier.}
+\end{align}
+
+\subsubsection{The Immigration-Death Process: Deterministic Dynamics}
+An island receiving immigrants that do not reproduce, but only die in it conforms to a \textit{sink} population. We can contrast the stochastic description above with its deterministic counterpart, which is given by the following differential equation\footnote{Notice that you can derive the deterministic equation for the average from the master equation as we did for the Poisson distribution. Try it at home by yourself. It does not cause any harm!!!}: 
+\begin{equation}
+\frac{dN}{dt} = \lambda - \mu N
+\label{Eq_Death_Imm}
+\end{equation}
+Here $N$ is $\langle n \rangle$, this is, the average number of individuals in the island, which evolves in time according to Eq (\ref{Eq_Death_Imm}).  Solving this equation for steady states results in the solution: 
+$$0 = \lambda-\mu N^* \Rightarrow N^* = \frac{\lambda}{\mu}. $$
+Thus the expected value of the stochastic variable is the same as the one obtained as a solution to the deterministic system. 

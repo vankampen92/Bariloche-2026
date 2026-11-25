@@ -1,0 +1,87 @@
+ \subsection{The Poisson Process: an alternative derivation}
+\label{subsection:Poisson_Process}
+Here an alternative derivation of the Poisson distribution is presented. 
+\smallskip
+
+Now consider a set of $M$ independent but identical systems $X_i (i = 1, ..., M)$ in paral.lel universes where identically counting processes take place with the same rate parameter $\lambda$. This set is usually called a {\em statistical ensemble}. This concept is central in statistical physics and is carefully presented in section \ref{MEq_Approach}.  Let $N(n, t)$ be the number of systems that have had $n$ people arrivals at time $t$. To understand how $N$ changes in a small amount of time $dt$, we do some accounting. Since $N(n, t + dt) = \Pb[\textrm{arrival occurs}] N(n-1, t) + \Pb[\textrm{no arrival}] N(n,t)$, we begin with the following equation.
+
+\begin{align}
+    N(n, t + dt) &= \lambda dt N(n-1, t) + (1- \lambda dt) N(n,t). \\
+\intertext{Rearranging, we get}
+    \frac{N(n, t+dt) - N(n,t)}{dt} &= \lambda N(n-1, t) - \lambda N(n,t)
+\intertext{so we can describe the system with the differential equations}
+  \frac{dN(n,t)}{dt} &= \lambda N(n-1, t) - \lambda N(n,t),  &n > 0 \label{Eq_ME_n}\\
+  \frac{dN(0,t)}{dt} &= - \lambda N(0,t),  &n = 0 \label{Eq_ME_0}
+\intertext{We aim to find a description for the probability distribution $\Pb[n,t]$. For the case in which $n=0$, we have an easy solution: $N(0,t) = N_0 e^{-\lambda t}$,  where 	$N_0 = N(0,0)$ is the initial condition of the ensemble. If we assume we start with M the systems with no arrivals at time zero, $N_0 = M$. We can then write }
+    \frac{dN(1,t)}{dt} &= \lambda N(0,t) - \lambda N(1,t)               \\
+    & = \lambda M e^{-\lambda t } - \lambda N(1,t).       \label{Eq_n_1}\\ 
+\intertext{Note that this differential equation is non-homogenous. The first term, depending on $t$ but not on $N$, can be thought of as external forcing on the system. In this case, we can find an exact solution through the method of variation of parameters. We proceed by dropping the first term, and solving the homogenous system} 
+    \frac{dN(1,t)}{dt} &= - \lambda N(1,t) \ldots \quad \Rightarrow \quad \frac{d\tilde{N}}{dt} = -\lambda \tilde{N}. \\
+\intertext{We know this differential equation has a solution of the form $\tilde{N}(t) = 	\tilde{N_0}e^{-\lambda t}$; in particular, $\tilde{N}(t) = e^{-\lambda t}$ satisfies (7). We then define a function $F(t)$ such that }
+    N(1,t) &= \tilde{N}(t) F(t) =  e^{-\lambda t} F(t) \label{Eq_N1t}\\
+\intertext{Differentiating, we find that}
+    \frac{dN(1,t)}{dt} &= \tilde{N}(t) \frac{dF}{dt} + F(t) \frac{d\tilde{N}}{dt} \\
+        &= e^{-\lambda t} \frac{dF}{dt}  - \lambda  e^{-\lambda t} F(t). \\
+\intertext{Comparing this to Eq. (\ref{Eq_n_1}) and canceling terms, we find }
+    \lambda M e^{-\lambda t } - \lambda N(1,t) &=  e^{-\lambda t} \frac{dF}{dt}  - \lambda  e^{-\lambda t} F(t). \\
+    \frac{dF}{dt} = \lambda M \quad &\Rightarrow \quad F(t) = \lambda M t + F_0.\\
+\intertext{Using our guess (see Eq. (\ref{Eq_N1t})), we find that}
+    N(1,t) &=\tilde{N}(t) F(t) = \lambda t M e^{-\lambda t} + F_0\,e^{-\lambda t}.
+\intertext{However, since we require that N(1,0) = 0 (because all M systems start with no individuals in the line at time zero, this is, N(0,0) = M), the constant $F_0$ should be zero, which means the solution we were looking for is just written as:}
+    N(1,t) &= \lambda t M e^{-\lambda t}
+\intertext{If we repeat this procedure to find $N(2,t), N(3, t), \ldots$, we find that}
+    N(n) &= M \frac{(\lambda t)^n}{n!} e^{-\lambda t}. 
+\intertext{Now consider $N(n)/M$, the fraction of systems in the statistical ensemble with $n$ arrivals. In the limit, this fraction corresponds to a probabilitiy. More precisely, it follows that} 
+\Pb(n, t) &= \lim_{M \rightarrow \infty} \frac{N(n)}{M} = \frac{(\lambda t)^n}{n!} e^{-\lambda t}. \label{Eq_Poisson_Final}
+\end{align}
+Thus as the number of systems in the stochastic ensemble goes to infinity, the fraction of systems with $n$ arrivals approaches a Poisson distribution with rate parameter $\lambda t$. We remark here that the parameter of the Poisson distribution depends linearly on time. In a Poissonian counting process, the interpretation of this result is just saying that if, for instance, there are 4 people arriving to the line in an hour on average, in two hours you will have 8, on average, and in three, 12, and so on. This is equivalent to say that the deterministic equation describing this process is given by:
+\begin{equation}
+    \frac{d\langle n \rangle}{dt} = \lambda
+    \label{ODE_Average}
+\end{equation}
+which solution, given that this average is zero at time $t=0$, as we have assumed since the very beginning, is simply given by:
+\begin{equation}
+    \langle n \rangle = \lambda \,t
+    \label{PoissonDet}
+\end{equation}
+
+We can always derive the deterministic evolution of the average (see Eq (\ref{PoissonDet})) from the stochastic description.  Notice that the limit step performed to derive the final Poisson distribution (see Eq. (\ref{Eq_Poisson_Final})) could have been done right from the outset from the initial Eqs (\ref{Eq_ME_n})-(\ref{Eq_ME_0}). This limit operation yieds:
+\begin{align}
+    \frac{dP(n,t)}{dt} &= \lambda P(n-1, t) - \lambda P(n,t),  &n > 0 \label{ME_Final_Poisson_n}\\
+    \frac{dP(0,t)}{dt} &= -\lambda P(0,t),                     &n = 0  \label{ME_Final_Poisson}
+\end{align}
+This is the so-called master equation for a Poissonian counting process (see section \ref{MEq_Approach} for a derivation for general one-dimensional one-step processes). Notice that a master equation is not a single equation but a system of ODEs. We have a different ODE for each $n$. We can build an equation for the average by multiplying each of these equations by its corresponding $n$ and summing. If you do so, you should recover Eq (\ref{ODE_Average}).
+\smallskip
+
+We can also derive an equation for the probability generating function. The procedure is analogous as the one described above to derive an equation for the average, but now multipliying each ODE in Eqs (\ref{ME_Final_Poisson}) for the corresponding constant factor $x^n$ and summing. This yields:
+\begin{equation}
+    \frac{\partial G(x,t)}{\partial t} = \lambda(x-1)\,G(x,t)
+    \label{GenFunc_Poisson}
+\end{equation}
+where we have used instead partial derivatives because the probability generating function depends here on both $x$ and $t$.  We remark that Eq (\ref{GenFunc_Poisson}) and Eqs (\ref{ME_Final_Poisson_n})-(\ref{ME_Final_Poisson}) encode the same information. Therefore, the solution given by final Eq (\ref{Eq_Poisson_Final}) can also be found through the last equation. The solution of Eq (\ref{GenFunc_Poisson}) can be calculated if we try a factorized form of the function $G(x,t)$. We first make the guess that the solution takes the form of a product of two different functions depending on each of the variables, this is, $G(x,t)=H(x)F(t)$, and then see if such a guess works\footnote{One of the most common methods for solving basic partial differential equations is this method, which is called the method of separation of variables. If you are in front of a partial differential equation, it is always worthed to give it a try!!!}:
+\begin{equation}
+    H(x) \frac{dF(t)}{dt} = H(x) \lambda(x-1)\,F(t)
+\end{equation}
+which luckily yields a nice equation for $F(t)$:
+\begin{equation}
+    \frac{dF(t)}{dt} = \lambda(x-1)\,F(t)
+\end{equation}
+whose solution corresponds to an exponential:
+\begin{equation}
+    F(t)= F_0\,e^{\lambda(x-1)\,t}
+\end{equation}
+Therefore, the final solution should written as:
+\begin{equation}
+    G(x, t)= H(x)\,F_0\,e^{\lambda(x-1)\,t}
+\end{equation}
+However, the normalization condition that all probability generating function should fulfill is $G(1,t)=1$ for any $t$. If you think about it, this means that the prefactor before the exponential should be necessarily equal to one ($H(x)=F_0=1$). Therefore, the final solution for the probability generating function of a Poisson counting process, this is, the particular solution of Eq (\ref{GenFunc_Poisson}) we are interested in, is given by: 
+\begin{equation}
+    G(x, t)= e^{\lambda(x-1)\,t} = e^{\lambda\,x\,t} e^{-\lambda\,t}
+\end{equation}
+If we recall that the Taylor expansion (around 0) of a simple exponential, $e^x$, is given by $\sum\limits_{n=0}^{\infty} \frac{1}{n!} x^n$, then this solution can be re-written as\footnote{$\sum\limits_{n=0}^{\infty} \frac{1}{n!} x^n$ and $e^x$ are equivalent representations of the same function. In fact, computers only know about the former. The latter is only used by mathematicians in their analytic calculations.}:
+\begin{eqnarray}
+    G(x, t) &=& \sum\limits_{n=0}^{\infty} \frac{(\lambda\,x\,\,t)^n}{n!} e^{-\lambda\,t} \nonumber \\
+    G(x, t) &=& \sum\limits_{n=0}^{\infty} \frac{(\lambda\,t)^n}{n!} e^{-\lambda\,t} x^n 
+\end{eqnarray}
+which means that, by using again the definition of the probability generating function (see Eq (\ref{GenFunc_Def})), the probabilities for each $n$ are given by Eq (\ref{Eq_Poisson_Final}), the Poisson distribution, from $n=0,1, \dots$.
+

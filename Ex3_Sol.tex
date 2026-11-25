@@ -1,0 +1,231 @@
+% ===============================================
+% ECEV 33400: Stochastic Processes      Fall 2017
+% hw_draft.tex
+% Template for first draft of homework submission
+% ===============================================
+
+% -----------------------------------------------
+% The preamble that follows can be ignored. Go on
+% down to the section that says "START HERE" 
+% -----------------------------------------------
+
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage[ampersand]{easylist}
+\usepackage{changepage}
+\usepackage{graphicx}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{{\mathbb F}}
+\newcommand{\Pb}{{\mathbb P}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\Frac}[2]{\left(\frac{#1}{#2}\right)}
+\newcommand{\Eval}[2]{\big|_{#1}^{#2}}
+\newcommand{\intinf}{\int_{-\infty}^{\infty}}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+\setlength{\parindent}{1cm}
+
+\include{format_code_macro}
+
+\renewcommand\theequation{\arabic{equation}}
+
+\begin{document}
+
+% ------------------------------------------ %
+%                 START HERE                 %
+% ------------------------------------------ %
+
+\title{Homework 3 with Solutions} % Replace X with the appropriate number
+\author{ECEV 33400} % Replace  "\iffalse X \fi" with your name.
+\date{Due Date: Thursday 10/26/2017} % Don't change this! :( 
+
+\maketitle
+
+% -----------------------------------------------------
+% First problem
+% -----------------------------------------------------
+
+\begin{problem}{1}
+ 	\item Consider two real-valued random variables, $X_1$ and $X_2$, related to each other through a linear transformation, $X_2 = a\,X_1\,+\,b$. Show that their corresponding probability density function functions are related by the same multiplicative constant.  
+\end{problem}
+
+\begin{solution}
+	
+    \item {\bf A rather expanded solution:} We find first the probability distribution function (CDF) associated to the random variable, $X_2$, which is related to $X_1$ through a linear shift, in terms of the CDF of $X_1$.  By definition, we have:
+    \begin{align}
+      F_2(x) &= P(X_2 \leq x) \nonumber \\
+             &= P(X_1 \leq \frac{x - b}{a}) \nonumber \\
+             &= F_1\left( \frac{x - b}{a} \right)
+    \end{align}
+    We have shown then that $F_2(x) = F_1 ( (x - b)/a )$.
+    \smallskip
+
+    Notice now that, by definition, we can write the expression above in term of density function of $X_1$:
+    \begin{align}
+      F_2(x) &= F_1\left( \frac{x - b}{a} \right) \nonumber \\
+             &= \int_{-\infty}^{\frac{x - b}{a}} f_1(u) du
+      \label{eq1}         
+    \end{align}
+    We can write the integral above in a different way by using the change of variable $u = (w-b)/a$. In terms of integration variable $w$, the integral in Eq (\ref{eq1}) can be written as:
+    \begin{align}
+      F_2(x) &= \int_{-\infty}^x \frac{1}{a} f_1\left (\frac{w - b}{a} \right) dw \nonumber\\
+             &= \int_{-\infty}^x f_2(w) dw 
+    \end{align}
+    We have shown that $f_2(x)$ is related to $f_1(x)$ by a multiplicative constant:
+    \begin{equation}
+      f_2(x) = \frac{1}{a} f_1\left (\frac{x - b}{a} \right)
+    \end{equation}
+    \smallskip
+    
+    In the last expression, there is the hidden assumption that $a > 0$, as density functions can only take positive values. If $a < 0$, then we should realize first that the correct relation between CDFs is given by
+    \begin{equation}
+      F_2(x) = 1 - F_1(\frac{x - b}{a}),
+    \end{equation}
+    Therefore, we should have written Eq. (\ref{eq1}) as:
+    \begin{align}
+      F_2(x) &= 1 - \int_{-\infty}^{\frac{x - b}{a}} f_1(u) du \nonumber\\
+             &= 1 -  \frac{1}{a} \int_x^{+\infty} f_1\left (\frac{w - b}{a} \right) dw \nonumber\\
+             &= 1 -  \frac{1}{a} ( 1 - \int_{-\infty}^{x} f_1\left (\frac{w - b}{a} \right) dw )
+      \label{eq2}         
+    \end{align}
+    The result is not as direct as before since we need to recall that we can always recovery the density function by deriving its probability distribution function (CDF):
+    \begin{align}
+      f_2(x) &= \frac{dF_2}{dx} \nonumber\\
+             &= \frac{d}{dx} \left(\int_{-\infty}^x \frac{1}{a} f_1\left (\frac{w - b}{a} \right) dw \right )
+    \end{align}
+               
+    By using again the same change of variable $u = (w-b)/a$, we can write:
+    \begin{align}
+      f_2(x) &= \frac{d}{dx} \left(\int_{+\infty}^{\frac{x-b}{a}} f_1(u) du \right ) \nonumber \\
+      &= \frac{d}{dx} \left(\int_{\frac{x-b}{a}}^{+\infty} f_1(u) du \right ) \nonumber \\
+      &= \frac{d}{dx} \left(1 - \int_{-\infty}^{\frac{x-b}{a}} f_1(u) du \right ) \nonumber \\
+      &=  -\frac{d}{dx} \left(\int_{-\infty}^{\frac{x-b}{a}} f_1(u) du \right) \nonumber \\
+      &=  -\frac{dw}{dx} \frac{d}{dw} \left(\int_{-\infty}^{w} f_1(u) du \right)   
+    \end{align}
+    where $$w = \frac{x-b}{a}$$ 
+    Therefore,
+    \begin{align}
+      f_2(x) &= -\frac{1}{a} f_1\left( \frac{x-b}{a} \right) \nonumber \\
+             &=  \frac{1}{|a|} f_1\left( \frac{x-b}{a} \right)
+    \end{align}
+    Again, we have shown that $f_2(x)$ is related to $f_1(x)$ by a multiplicative constant, $|a|$.
+      
+    \item {\bf A more compact solution:} It will be simplest to start with the CDFs. If we say $F_i$ is the CDF of $X_i$, this means that $F_i(x) = P(X_i \leq x)$. So
+	\begin{align}
+		F_2(x) &= P(X_2 \leq x)\\
+		&= P(a \, X_1 + b \leq x)\\
+		&= \begin{cases}
+				P(X_1 \leq \frac{x - b}{a}), \quad &if \ a > 0\\
+				P(X_1 \geq \frac{x - b}{a}), \quad  &if \ a < 0
+			\end{cases}\\
+		&= \begin{cases}
+				F_1(\frac{x - b}{a}), \quad  &if \ a > 0 \\
+				1 - F_1(\frac{x - b}{a}), \quad  &if \ a < 0 
+			\end{cases}\\
+		\intertext{which relates the CDFs. We can easily show a relationship for PDFs ($f_i$), as well, using the fact that $\frac{d}{dx}F_i(x) = f_i(x)$. Differentiating the relationship found above, we have}
+		f_2(x) &= \begin{cases}
+						\frac{1}{a}f_1(\frac{x - b}{a}), \quad  &if \ a > 0\\
+						\frac{-1}{a}f_1(\frac{x - b}{a}), \quad  &if \ a < 0
+					\end{cases}\\
+		&= \frac{1}{|a|}f_1(\frac{x - b}{a}) 
+	\end{align}
+	
+\end{solution}
+
+% -----------------------------------------------------
+% Second problem
+% -----------------------------------------------------
+
+ \vspace{0.25in} % This just adds some space between problems 1 and 2.
+
+\begin{problem}{2}
+Consider the stochastic model underlying the theory of island biogeography in the limit of  $S \rightarrow \infty$. Assume a system of $K$ islands along an environmental gradient that makes extinction change from island to island. Therefore, species arrive to the island at the same rate, $\lambda$, the colonization rate, but, they get extinct at a different rates, $\mu_i$, $i=1, \dots, K$. The configuration of the system at any give time is fully defined by the vector $(n_1, \dots, n_K)$, the $K$-dimensional state variable of the system.\\
+(a) List the total number of events changing system configuration, $(n_1, \dots, n_K)$, at any given time. \\
+(b) Calculate the total rate of any configuration change happening in the system at any given time.\\ 
+(c) Using Gillespie algorithm, build stochastic replicates and store the state of the system at increasing times, $t_i= i\,\Delta t$. In different plots, represent the total number of species in the archipelago, and the number of species in an island of intermediate extinction. Start from an empty archipelago and use the following parameters:\\
+i. $K=100$, $\lambda = 10.0$, $\mu_i = \mu_0 p^{i-1}$ with $i=1, \dots, K$, $p = 0.99$ and $\mu_0 = 1.0$.\\
+ii. $K=10000$, $\lambda = 10.0$, $\mu_i = \mu_0 p^{i-1}$ with $i=1, \dots, K$, $p = 0.9999$ and $\mu_0 = 1.0$. Discuss optimal ways of updating the total rate and choosing the next event to happen. \\
+(d) What is the distribution for the total number of species in the archipelago, $N = \sum_{i=1}^K n_i$, at stationarity? Through simulation, assess that the distribution of this number over your stochastic replicates tends to this theoretical distribution as time increases.  
+\end{problem}
+
+
+\begin{solution}\ \\
+	\item (a) Let us take an interval of time sufficiently short so that only one event occurs in the system. This event is always either an extinction or colonization, and can occur on any of the $K$ islands. Therefore, there are a total of $2K$ distinct events that can change the system configuration.
+	
+	\item (b) The islands evolve independently in time, so the total rate of configuration change is the sum of their individual transition rates. Every island experiences colonization at a constant rate, $\lambda$. Extinctions occur at per capita rates $\mu_i$. Therefore we have the total rate
+	
+    $$ \sum_{i=1}^{K} \lambda + \mu_i n_i = K \lambda + \sum_{i=1}^{K} \mu_i n_i$$
+    
+  \item (c) I show the plots for case i and ii in Figures 1-4.\\
+  
+  \begin{figure}
+\includegraphics[width=\linewidth]{100islands}
+\caption{Total number of species over time for case i, with parameters $K=100$, $\lambda = 10.0$, $\mu_i = \mu_0 p^{i-1}$ with $i=1, \dots, K$, $p = 0.99$ and $\mu_0 = 1.0$.}
+\end{figure}
+\begin{figure}
+\includegraphics[width=\linewidth]{Island50}
+\caption{Simulation for island 50 in case i.}
+\end{figure}
+\begin{figure}
+\includegraphics[width=\linewidth]{10000islands}
+\caption{Total number of species over time for case ii, with parameter $K=10000$, $\lambda = 10.0$, $\mu_i = \mu_0 p^{i-1}$ with $i=1, \dots, K$, $p = 0.9999$ and $\mu_0 = 1.0$.}
+\end{figure}
+\begin{figure}
+\includegraphics[width=\linewidth]{island5000}
+\caption{Simulation for island 5000 in case ii.}
+\end{figure} 
+  
+  Here, the implemented method for Gillespie algorithm is the first reaction method (see \cite{Keeling08}, chap 6).
+  
+  \item (d) In general, we know that the sum of independent random variables is a new random variable with probability generating function the multiplication of generating functions. More precisely, if $Z_n = X_1 + \dots + X_n$, and $G_i(x)$ is the probability generating function of $X_i$, then the probability generating function of $Z$ is:
+  \begin{equation}
+  	G(x) = \prod_{i=1}^n G_i(x)
+    \label{eq_prod}
+  \end{equation}
+  In this case, the number of species in each island is described by a Poisson distribution of parameter $\lambda/\mu_i$, which can represented by its associated probability generating function:
+  \begin{equation}
+  	G_i(x) = \exp\left( \frac{\lambda}{\mu_i}(x-1) \right)
+  \end{equation}
+  Since islands undergo independent dynamics, Eq. (\ref{eq_prod}) holds. 
+  \begin{align}
+  	G(x) &= \prod_{i=1}^n \exp\left( \frac{\lambda}{\mu_i}(x-1) \right) \nonumber \\
+    	 &= \exp \left( \sum_{i=1}^K\frac{\lambda}{\mu_i}(x-1) \right)
+  \end{align}
+  There, the parameter of the Poisson distribution associated to the random variable representing the total number of species across islands at stationarity is given by the sum of parameters:
+  \begin{align}
+  	R   &= \frac{\lambda}{\mu_0} \sum_{i=0}^{K-1}\frac{1}{p^i} \nonumber \\
+    	&= \frac{\lambda}{\mu_0} \frac{1-(1/p)^K}{1-(1/p)}
+  \end{align}
+  
+  In fact, our simulations show us in Figure 5 that 300 replicates of our system sampled several times once reached the equilibrium display a distribution very close to the theoretical one.
+  
+\begin{figure}
+\centering
+\includegraphics[width=0.8\linewidth]{Stationary}
+\caption{In grey, the result of 300 simulations of the case i, sampled once reached stationarity. In red, the expected distribution for a Poisson with a rate equal to the sum of rates of each island.}
+\end{figure}
+
+\end{solution}
+\vspace{10in}
+Below you can find the code used to answer this Homework.
+\rcode{Islands.R}

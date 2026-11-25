@@ -1,0 +1,104 @@
+% ================================================================
+% Drop-in section for notes.tex
+% Requires \usepackage{amsmath,amssymb} and \usepackage{natbib}.
+% Bibliography entries: advanced_stochastic_processes_readings.bib
+% ================================================================
+
+\section{Basic Concepts, Definitions, and Examples}
+\subsection{Random variables and Probability Distributions}
+
+\subsubsection{Review Random Variables }
+Review the definition of integer-value random variables -- conceptually, as variables that take values as the result of an experiment. 
+
+\subsubsection{Probability Generating Functions} 
+Probability generating functions are an extremely useful way to describe random variables. For an integer-valued random variable $X$ such that $\Pb[X=j] = p_j$, the probability generating function is defined as 
+
+$$ G(x) = \sum_{j=0}^{\infty}p_j x^j. $$
+
+Note that we can easily calculate the expected value
+
+$$G'(1) = \sum_{n=1}^{\infty} p_n n x^{n-1} = \sum_{n=0}^{\infty} n p_n = \E[X]$$,
+
+and similarly higher moments (variance, etc.). 
+
+u\ruby{More explanation here. Explicit description of how the equation for variance can be found using the generating function.}
+
+\bigskip
+
+\textbf{Some useful facts:} \\
+
+\begin{easylist}[itemize]
+  & Example: Convolution (sums)
+      && Let $X$ and $Y$ be random variables with probability generating functions $G_X(u)$ and $G_Y(u)$ respectively. Consider the random variable $Z = X + Y$. A useful fact is that $G_Z(u) = G_X(u)G_Y(u)$. 
+      && Suppose $Z_n = X_1 + \cdots + X_n$ is the sum of $n$ independent identically distributed random variables, with generating function $G_X(u)$. Then $G_{Z_n}(u) = [G_X(u)]^n$. For example, consider Bernoulli distributed $X_i$. Using the form of the generating function, we find that $Z_n$ is binomially distributed.
+& Example: Compound (composite)
+	&& Suppose $Z_N = X_1 + \cdots + X_n$ is the sum of $N$ independent identically distributed random variables $X_i$. Now let $N$ be a random variable with generating function $G_N(u)$. Then $G_{Z_N}(u) = G_N(G_X(u))$. 
+\end{easylist}
+ 
+\subsection{The Poisson Process}
+\label{subsection:Poisson_Process}
+The following is a derivation of the Poisson process as a \textbf{counting process}. Let $X$ be an integral-valued random variable that changes stochastically in time. For example, let $X(t) = n$ describe the number of people that have arrived in a line, where the only event that can occur is the arrival of another person. The dynamics of the system are thus described by the rate parameter $\lambda$, where the probability that another person arrives in a small amount of time $dt$ is given by $\Pb[n \rightarrow n+1] = \lambda dt$.
+
+Now consider a set \david{Good idea. Notice now the footnote} \vicente{The idea of statistical ensemble is presented in section 2, maybe it would be better to move that explanation here or reformulate this phrase}of $M$ independent but identical systems $X_i (i = 1, ..., M)$\footnote{This set is usually called a {\em statistical ensemble}. This concept is central in statistical physics and is carefully presented in section 2.} with the same rate parameter $\lambda$. Let $N(n, t)$ be the number of systems that have had $n$ arrivals at time $t$. To understand how $N$ changes in a small amount of time $dt$, we do some accounting. Since $N(n, t + dt) = \Pb[\textrm{arrival occurs}] N(n-1, t) + \Pb[\textrm{no arrival}] N(n,t)$, we begin with the following equation.
+
+\begin{align}
+	N(n, t + dt) &= \lambda dt N(n-1, t) + (1- \lambda dt) N(n,t). \\
+\intertext{Rearranging, we get}
+	\frac{N(n, t+dt) - N(n,t)}{dt} &= \lambda N(n-1, t) - \lambda N(n,t)
+\intertext{so we can describe the system with the differential equations}
+  \frac{dN(n,t)}{dt} &= \lambda N(n-1, t) - \lambda N(n,t),  &n > 0 \\
+  \frac{dN(0,t)}{dt} &= - \lambda N(0,t),  &n = 0 
+\intertext{We aim to find a description for the probability distribution $\Pb[n,t]$. For the case in which $n=0$, we have an easy solution: $N(0,t) = N_0 e^{-\lambda t}$,  where 	$N_0 = N(0,0)$ is the initial condition of the ensemble. If we assume we start with M systems with no arrivals at time zero, $N_0 = M$. We can then write }
+	\frac{dN(1,t)}{dt} &= \lambda N(0,t) - \lambda N(1,t) \\
+	& = \lambda M e^{-\lambda t } - \lambda N(1,t).\\ 
+\intertext{Note that this differential equation is non-homogenous. The first term, dependent on $t$ but not on $N$, can be thought of as external forcing on the system. In this case, we can find an exact solution through variation of parameters. We proceed by dropping the first term, and solving the homogenous system} 
+	\frac{dN(1,t)}{dt} &= - \lambda N(1,t) \ldots \quad \Rightarrow \quad \frac{d\tilde{N}}{dt} = -\lambda \tilde{N}. \\
+\intertext{We know this differential equation has a solution of the form $\tilde{N}(t) = 	\tilde{N_0}e^{-\lambda t}$; in particular, $\tilde{N}(t) = e^{-\lambda t}$ satisfies (7). We then define a function $F(t)$ such that }
+	N(1,t) &= \tilde{N}(t) F(t) =  e^{-\lambda t} F(t)\\
+\intertext{Differentiating, we find that}
+	\frac{dN(1,t)}{dt} &= \tilde{N}(t) \frac{dF}{dt} + F(t) \frac{d\tilde{N}}{dt} \\
+		&= e^{-\lambda t} \frac{dF}{dt}  - \lambda  e^{-\lambda t} F(t). \\
+\intertext{Comparing this to (7) and canceling terms, we find }
+	\lambda M e^{-\lambda t } - \lambda N(1,t) &=  e^{-\lambda t} \frac{dF}{dt}  - \lambda  e^{-\lambda t} F(t). \\
+    \frac{dF}{dt} = \lambda N_0 \quad &\Rightarrow \quad F(t) = \lambda M t + F_0.\\
+\intertext{Using the particular solution where $F_0 = 0$, we find that}
+	N(1,t) &=\tilde{N}(t) F(t) = \lambda t M e^{-\lambda t}.
+\intertext{If we repeat this process to find $N(2,t), N(3, t), \ldots$, we find that}
+	N(n) &= M \frac{(\lambda t)^n}{n!} e^{-\lambda t}. 
+\intertext{Now consider the random variable $ Y = \frac{N(n)}{M}$, the fraction of systems in the statistical ensemble with $n$ arrivals. It follows that} 
+ \Pb(n, t) &= \lim_{M \rightarrow \infty} \frac{N(n)}{M} = \frac{(\lambda t)^n}{n!} e^{-\lambda t}.
+ \end{align}
+Thus as the number of systems in the stochastic ensemble goes to infinity, the fraction of systems with \david{corrected} \vicente{typo: with} $n$ arrivals approaches a Poission distribution with rate parameter $\lambda t$.
+
+\subsection{Deterministic {\em vs} Stochastic Dynamics}
+See Assignment 1. 
+\textbf{Example 1. }Suppose you have an island with a certain number of species $n$. The probability a new species arrives in time $dt$ is given by $\Pb[n \rightarrow n+1] = \lambda\ dt$. The probability of loosing a species to extinction is dependent on the current number of species and is given by $\Pb[n \rightarrow n -1] = \mu\ n\ dt$. By accounting, we have the following differential equations for the probability distribution describing $n$:\vicente{In the following text, I took the liberty of adding command "limits" to command "sum" to make it prettier (see ..."it must satisfy..."}
+\begin{align*}
+	\frac{dP(n,t)}{dt}	&= \lambda P(n-1, t) - \lambda P(n, t) - \mu n P(n, t) + \mu (n + 1) P(n+1, t) \\
+    					&= \lambda P(n-1, t) + \mu( n + 1) P(n+1, t) - (\lambda + \mu\ n) P(n,t) \\
+\intertext{While hard to find a close form solution, we are able to find a stationary probability distribution.}
+	\frac{dP(n,t)}{dt}	&= \lambda P(n-1, t) - \mu n P(n,t) - (\lambda P(n, t) - \mu(n+1) P(n+1,t)) \\
+\intertext{Assuming the system is at steady state (*), we then have}
+    P^*(n) &= \frac{\lambda}{\mu n} P^*(n-1) \\
+    P^*(n) &= \Frac{\lambda}{\mu n} \Frac{\lambda}{\mu (n+1)}P^*(n-2) \\    
+    		 &\vdots \\
+    P^*(n) &= \frac{\lambda}{\mu n}^n \Frac{1}{n!} P_0 \\
+\intertext{Since $P(n)$ describes a probability distribution, it must satisfy $\sum\limits_{n=0}^{\infty} P^*(n) = 1$. Thus, it follows that }
+	P_0 &= \frac{1}{\sum\limits_{n=0}^{\infty}\Frac{\lambda}{\mu}^n \Frac{1}{n!}}.
+\intertext{Recall that $\sum\limits_{n=0}^{\infty} \frac{1}{n!} x^n = e^x$, so we recover }
+	P^*(n) &= \Frac{\lambda}{\mu}^n \Frac{1}{n!} e^{-\lambda/\mu}
+\intertext{which describes the Poisson process. Note that the expected value of $n$, the number of species on the island, is the rate parameter $\frac{\lambda}{\mu}$. This means that the stationary distribution is controlled by the composite parameter $\frac{\lambda}{\mu}$, describing the number of species that arrive in the average time that it takes for a species to leave (or become locally extinct).}
+\end{align*}
+
+We can contrast this stochastic model with its deterministic counterpart, described by the following differential equation: 
+	$$ \frac{dN}{dt} = \lambda - \mu N.$$
+Solving this equation for steady states results in the solution 
+	$$\frac{dN^*}{dt} = 0 \Rightarrow N^* = \frac{\lambda}{\mu}. $$
+Thus the expected value of the stochastic system is the same as the single solution to the deterministic system. 
+
+\subsection{Models and Data: the Likelihood Approach}
+See Assignment 1. Chapter 7 of \textit{The Ecological Detective.}
+% \textbf{Example 2.} Consider a system of $S$ islands where species dynamics behave as in \textbf{Example 1.} (i.e., species numbers on each island $N_1, N_2, \ldots, N_S$ follow a Poisson distribution). Suppose that on each island, there are exactly $N_i$ species but you only observe $n_i$ with detection probability $\alpha \leq 1$ (i.e. $n_i = \alpha N_i$). 
+% -----------------------------------------------------
+% First problem
+% -----------------------------------------------------

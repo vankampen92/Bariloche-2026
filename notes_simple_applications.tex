@@ -1,0 +1,257 @@
+
+\section{One-step processes at work: three simple examples}
+We present three illustrative case studies to demonstrate the application of the theoretical framework and analytical methods developed so far to canonical ecological problems. Although deliberately simplified, these applications are empirically relevant and have substantially influenced modern ecological theory. In each case, the dynamics can be formulated in terms of a one-dimensional state variable describing the system at a given time.
+
+First, we revisit Michaelis–Menten kinetics. A fully consistent stochastic treatment of this system generally requires a multidimensional master equation. Here, however, the analysis is used primarily to motivate the emergence of a Holling type II functional response for the per-capita prey consumption rate over the total predator population. This result provides a basis for investigating the dynamics of a consumer feeding on a resource exhibiting logistic growth, our second example. For example, this formulation could represent an exploited resource (e.g. a fishery) harvested by humans at a fixed fishing effort. Notice that the catch rate of a fixed number of fishing vessels is expected to saturate with increasing resource density due to handling-time constraints associated with processing each additional capture.
+
+Finally, we introduce the simple stochastic model underlying Island Biogeography Theory \cite{MacArthur67}, namely a colonization–extinction process.
+
+\subsection{The Stochastic Theory of Island Biogeography Theory: \\
+Colonization and extinction processes on an island}
+In this example, we highlight another important point in modeling natural systems. We require first to decide which potentially measurable variables we will use to carefully characterize the state of the system under study. This depends on the which particular question we want to addres, but, in all cases, it is the first crucial decision we should make. In most previous applications, we have chosen to describe the system by the number of individuals, this is, our state variable, $N$, can take all non-negative integer values. However, for some applications, it is useful to coarse-grain this description. Sometimes it is difficult to measure accurately the number of individuals of a species. In a given island, natural reserve or particular site, it is often easier to assess whether the species is present or absent. In this case, the variable characterizing the system can only take two values to indicate either presence or absence of the species under study. This {\it coarse-grained} variable will be a Boolean stochastic variable, $X$. Conventionally, we will say it will take the value 1 if the species is present, and 0, if it is absent. Therefore, the system now can only be in two different states (0 and 1). What are then the processes by which the system jump between these two possible configurations?  These two configurations may change as a result of two ecological processes: species extinction ($1 \rightarrow 0$), and species colonization ($0 \rightarrow 1$). 
+\smallskip
+
+If we know how to describe a system by enumerating all its possible configurations and what are the events (and their associated rates) allowing the system to jump between configurations, then we can apply the Gillespie algorithm to generate stochastic replicates, and we can write down ---and tried to solve--- the master equation describing the temporal evolution of the discrete probability distribution over configurations.
+\smallskip
+
+Therefore, in modeling a colonization-extinction process of a species in an island, we need to make an assumption about the rates at which these two processes occur. The simplest assumption is (compare to Eq (\ref{eq:pb})):
+\begin{eqnarray}
+\Pb\{ 0 \longrightarrow 1 \} & = & c\,dt \nonumber\\
+\Pb\{ 1 \longrightarrow 0 \} & = & e\,dt
+\label{eq:c-e}
+\end{eqnarray}
+The inverse of $c$ is a measure of the average time the system is empty until the focal species colonizes the island. Analogously, one over $e$ is the average time it takes for the species to go extinct. We make the assumption that these rates remain constant in time. 
+\smallskip
+
+Now we are in a position to write down the master equation describing the temporal evolution of the discrete probability distribution associated to the presence-absence stochastic variable. As any other Boolean stochastic variable, this probability distribution is just characterized by two values: probability of presence ($P_1$) and probablity of absence ($P_0$). The full master equation is given by:
+\begin{eqnarray}
+\frac{dP(0,t)}{dt} &=&    e\, P(1,t) \,\, - \,\, c\, P(0,t)  \nonumber \\
+\frac{dP(1,t)}{dt} &=&    c\, P(0,t) \,\, - \,\, e\, P(1,t)  
+\label{me_c-e}
+\end{eqnarray}
+where $P(0,t) \equiv P_0$ and $P(1,t) \equiv P_1$. When a system can just visit a finite number of configurations, the master equation has always a matrix representation: 
+\begin{equation}
+\label{me_matrix}
+\frac{d}{dt}\left(
+\begin{array}{c}
+P_0 \\ 
+P_1 
+\end{array}
+\right) = \left[\begin{array}{cc}
+-c &  e \\
+ c & -e 
+ \end{array} 
+\right]
+\left(
+\begin{array}{c}
+P_0 \\ 
+P_1 
+\end{array}
+\right)
+\end{equation}
+
+As you see, Eqs (\ref{me_c-e}) ---or in matrix form, Eq (\ref{me_matrix})--- is nothing but a particular case of Eqs (\ref{me_1}) for a the system that can only be in two alternative configurations. Since $P_0$ and $P_1$ are complementary probabilities, they must sum up to one. Therefore, the temporal evolution of the probability distribution is determined by just one equation. Conventionally, we use the equation for the probability of the species being present at time $t$, which is called occupancy probability:
+\begin{equation}
+\frac{dp}{dt} = c\,(1-p) - e\,p
+\label{eq:HANSKI01}
+\end{equation}
+where $p$ has been defined as $P_1$. For instance, if we observe that the species is absent at time zero, $p(0) = P_1(0) = P(1,0) = 0$, then the solution for the species occupancy probability at time $t$ reads:
+\begin{equation}
+\label{t_10}
+p(t) = \frac{c}{e+c} ( 1 - \exp(-(e+c)t ))
+\end{equation}
+This solution\footnote{In order to solve ODE (\ref{eq:HANSKI01}), we use the method of variation of parameters, just as we did to find the solution of ODE (\ref{Eq_n_1}).} is the probability of a species being present in the island after some time $t$, given that the species was initially absent. 
+\smallskip
+
+When a system can just visit a finite number of configurations, we can always write down a discrete-time representation of the master equation, Eq (\ref{me_matrix}). This discretization adds one extra model parameter, which is the time between observations, $\Delta t$:
+\begin{equation}
+\label{Markov_model}
+\left(
+\begin{array}{c}
+P_0 \\ 
+P_1
+\end{array}
+\right)_{t+\Delta t} = \left[\begin{array}{cc}
+T_{00} & T_{01} \\
+T_{10} & T_{11}
+\end{array} 
+\right]
+\left(
+\begin{array}{c}
+P_0 \\ 
+P_1 
+\end{array}
+\right)_{t},
+\end{equation}
+where $T_{10}$ ($T_{01}$) is the probability of (not) finding certain species at time $t$ given that it was absent (present) at time $t=0$. In addition, conditional probabilities $T_{00}$ and $T_{11}$ satisfy $T_{00}=1-T_{10}$ and $T_{11}=1-T_{01}$, respectively. Discrete-time stochastic models, such as the one given by Eq. (\ref{Markov_model}), are usually called Markov chain models. In Markovian models, the state of the system after some time $\Delta t$ depends only on the state of the system at time $t$ and a given transition matrix, whose elements are transitions probabilities. In our case, we can consistently derive all four entries of the transition matrix in terms of the colonization and extinction rates, $c$ and $e$ (see Eq. \eqref{t_10}):
+\begin{equation}
+\label{T_00}
+\left\{
+\begin{array}{ccc}      
+T_{10}(\Delta t| c, e) &=&  \frac{c}{e+c} ( 1 - \exp(-(e+c)\Delta t) )\\  
+T_{01}(\Delta t| c, e) &=&  \frac{e}{e+c} ( 1 - \exp(-(e+c)\Delta t) )\\
+\end{array}
+\right.
+\end{equation} 
+To sum up, the stochastic discrete-time version of the model ---see Eq (\ref{Markov_model})--- gives the temporal evolution of the probability distribution, $(P_0,\, P_1)$, over discrete time steps, $\Delta t$. This parameter is usually chosen to be 1 in suitable time units (one week, one month, etc). 
+\bigskip
+
+As we have seen in our previous example, the central point in likelihood estimation is the ability to calculate the probability of observing a set of data under given model assumptions and parameter values. We have written the discrete model given by Eq (\ref{Markov_model}) because data are always obtained at discrete time values. Assume we are given a data vector whose elements represent island configurations at increasing (not necessarily equally-spaced) time values, $t_1, \dots, t_N$:
+\begin{equation}
+	\label{eq:data}
+	M = 
+	\left[
+	\begin{array}{rccccccc}
+	& t_1 & t_2 & t_3 & t_4  & t_5 & \dots & t_N                             \\
+	& 1 & 0 & 1 & 1 & 1 & \cdots & 0                                   \\
+%	2:    & 1 & 1 & 1 & 0 & 1 & \cdots & 1                                     \\
+%	\vdots\phantom{::} & \vdots & \vdots & \vdots & \vdots & \vdots &  & \vdots \\
+%	S_P:  & 0 & 1 & 0 & 1 & 1 & \cdots & 0                                    \\
+	\end{array}
+	\right],
+\end{equation}
+\smallskip
+
+If we assume that the data above have been generated by random colonization-extinction processes of a given species characterized by the colonization extinction rates $(c,\, e)$ , it is easy to calculate the likelihood of observing a series of occupancies across time, for instance, the vector $(1, 0, 1, 1, 1, \cdots, 0)$. If we generally write a presence/absence vector as ${\boldsymbol n}=(n(t_1),\dots,n(t_N))$ from times $t_{1}$ to $t_N$, then the probability of observing a given temporal presence/absence sequence, ${\boldsymbol n}$, is \citep{Alonso2015}:
+\begin{equation}
+P( {\boldsymbol n} | c, e) = \prod_{j=1}^{N-1}T_{n(t_{j+1}),n(t_j)}(t_{j+1}-t_{j}| c,e) 
+\label{Eq_lk}
+\end{equation}
+
+The last equation can be regarded as a likelihood function depending only on two model parameters, $(c,\,e)$. Again, given an observed series of occupancies for a species across time, we can ask for the values of $c$ and $e$ that maximize the likelihood of making exactly that series of observations. Usually, the search for optimal values in multi-parametric functions, such as Eq (\ref{Eq_lk}), is done by using appropriate numerical methods.
+\smallskip
+
+However, when an island has been sampled at regular times, the two independent matrix entries, $T_{10}$, and $T_{01}$, i.e., respectively, the colonization and extinction transition probabilities, can be estimated simply, by counting the frequency of observed transitions: 
+\begin{eqnarray}
+\label{N_10}
+T_{10} & = & \frac{N_{10}}{N_{10} + N_{00}} \\
+\label{N_01}
+T_{01} & = & \frac{N_{01}}{N_{01} + N_{11}}
+\end{eqnarray}
+where $N_{10}$ is the number of times a transition to colonization has been observed, $N_{01}$ is the number of times a transition to extinction has occurred, $N_{00}$ is the number of times a species has remained absent from the system, and $N_{11}$ is the number of times a species has remained present in the island from a given observation to the next. Provided regular sampling times, $\Delta t$,  one can show that these are the maximum likelihood estimates (m.l.e.) of the entries of the stochastic transition matrix, $T_{10}$ and $T_{01}$\footnote{In order to demonstrate that this is so, we require first to particularize the likelihood function Eq (\ref{Eq_lk}) for a constant $\Delta t$ between time observations, and derive the resulting function with respect to both $T_{10}$ and $T_{01}$ and equal both derivatives to zero. If you solve the system for the two unknowns, $T_{10}$ and $T_{01}$, you will see that the values that maximize this function are given by Eqs (\ref{N_01})-(\ref{N_10}).}. Once the maximum likelihood estimates of these transition probabilities have been found, we can invert equations Eqs (\ref{T_00}) to determined the maximum likelihood estimates of the initial model parameters $(c,\, e)$:
+\begin{equation}
+\begin{array}{ccccc}
+\frac{e}{c} &=& \frac{T_{01}}{T_{10}}           &=&      \frac{N_{01}(N_{10}+N_{00})}{N_{10}(N_{01}+N_{11})}\\
+e + c       &=& -\frac{1}{\Delta t}\log(1 - (T_{01}+T_{10})) &=& -\frac{1}{\Delta t}\log\left(\frac{N_{00}N_{11}-N_{01}N_{10}}{(N_{10}+N_{00})(N_{01}+N_{11})}\right)
+\end{array}
+\end{equation}
+
+\subsection{A consumer on a single resource: Michaelis-Menten kinetics}
+\label{MMkin}
+
+In the most simple case, consumers can attack resource items and then spend some time handling and/or digesting them, until they are ready to attack and capture new resources again. Therefore, feeding dynamics can be simply described by the following two processes:
+\begin{eqnarray}
+\ch{$A$ + $R$ &->[ $\alpha$ ]& $AR$ }, \label{int_AR_HII}
+\label{int_AR_HII_Tau}\\
+\ch{$AR$  &->[ $\nu$  ]& $A$},  
+\label{death_AR_HII}
+\end{eqnarray}
+where individual consumers $A$ encounter resource items $R$ at a rate $\alpha$ creating a pair or ``compound'' denoted as $AR$, i.e., a handling predator, which ``relaxes back'' into a free consumer at rate $\nu$ once the resource item is fully handled and digested. This is the simplest way to describe the consumption process \citep{real1977}. 
+\smallskip
+
+In addition, in this derivation, we consider that resource density is kept constant, at the same resource level, $n_R^0$. Since no reaction leading to consumer depletion is assumed, the total number of consumers, $n_A^0 = n_A + n_{AR}$, is also kept constant. In analogy to chemical kinetics, these two conditions ---constant population for both prey and predators--- are referred to as \emph{chemostatic conditions} \citep{vankampen2011}. The consumers can then be in two behavioral stages, either searching for new resources or handling them, $A$ and $AR$, respectively. At any given time, since the total number of consumers is constant, we can characterize the configuration of the system only by the number of searching consumers, $n_A$, free, and ready to attack new resources. If we assume that we can pack at most $N$ resources in an given area where consumers \emph{move randomly around}, their effective attack rate will be damped by the actual density of resources (which will be denoted as $x_R:=\frac{n_R}{N}$ in that area). To conceptualize this assumption, consider each prey item as equally available to predators, implying the system is ``well mixed''. If we assume an approximately uniform spatial distribution of prey, then the likelihood of a predator capturing a prey item will be proportional to the prey's spatial density, denoted as $x_R$. This standard assumption is often referred to as true \emph{mass action}\citep{mccallum2001should,vankampen2011}.
+\smallskip
+
+In this context, we can dynamically model the feeding process by using a one-step stochastic Markov process in continuous time \citep{Black2012}.  This formalism allows to express the temporal evolution of the probability of finding $n_A$ free consumers at time $t$, $P(n_A,t)$ through a master equation, which can be solved for the steady state. In this case, at stationarity, $n_A$ will follow a binomial distribution with parameters $p = \left(1 + \frac{\alpha}{\nu} x_R^0\right)^{-1}$ and $n_A^0$ (see Box~I for details), where $x_R^0$ is the density of resources. Accordingly, the average number of free consumers at stationarity will be given by $\langle n_A \rangle= p\,n_A^0$. The average rate of resource depletion caused by the total population of $n_A^0$ predators at stationarity will be given by $\theta\,\langle n_A \rangle = \theta p n_A^0$, where we defined $\theta:=\alpha\,x_R^0$. When this rate is expressed on a per capita basis, this is, as an average over the total population of predators, it gives rise to a {\em population-averaged} per capita feeding rate, the Holling Type II functional response: 
+\begin{equation}
+\langle f(x_R) \rangle = 
+\frac{\theta \langle n_A\rangle}{n_A^0} =
+\frac{\alpha x_R}{1 + \frac{\alpha}{\nu} x_R},
+\label{eq:HII_bis}
+\end{equation}
+where we have finally dropped the superscript 0 on resource densities. This emphasizes that, while $x^0_R$ was a parameter throughout our derivation, in Eq.~(\ref{eq:HII_bis}), it can be considered a true variable. We will also take this prescription to write the final expressions of the functional responses in all the derivations that follow. 
+\smallskip
+
+Notice that the classic expression by Holling includes the handling time, $\tau$, which is the average time it takes for an individual consumer to handle and digest a resource item. In our framework, the handling time is $1/\nu$, the average relaxation time associated with the first-order kinetics represented by reaction~(\ref{int_AR_HII_Tau}).   
+
+\begin{tcolorbox}\label{cha:box1}
+\noindent \textbf{Box I: Steady-state distributions of behavioral types (Holling Type II)\smallskip}
+
+\noindent Holling Type II feeding dynamics can be simply described by two discrete events: (1) the attack of resources, this is, an event that decreases the number of searching predators by one, and (2) the handling process, an event by which a handling predator relax back into the searching stage, and, as a consequence, the number of searching predators increases by one. This type of stochastic processes are known as birth-death or one-step stochastic processes. The master equation for one-step one-dimensional stochastic processes can be written as \citep{vankampen2011}:
+\begin{equation*}
+	\frac{d P_n(t)}{d t} = r_{n+1}\,P_{n+1}(t) + g_{n-1}\,P_{n-1}(t) -(r_n + g_n)\,P_n(t),
+\end{equation*}
+where $n$ is a non-negative integer number in population contexts, and $P_n(t)$ is the probability for the system to have $n$ individuals at time $t$. Notice that $r_0 = 0$, since the population cannot decrease from zero. In this situation, the last equation is valid only as long as $n>0$, and a particular equation determines $P_0(t)$:  
+\begin{equation*}
+\frac{dP_0(t)}{dt} = r_{1}\,P_1(t) - g_0\,P_0(t).
+\end{equation*}
+
+The process defined by the processes in Eqs.~(\ref{int_AR_HII})--(\ref{death_AR_HII}) is determined by the following transition probability rates:
+\begin{align*}
+&r_{n_A}:=T[n_A-1 | n_A]= \theta \,n_A,\\
+&g_{n_A}:=T[n_A+1 | n_A ]= \nu (n_A^0 - n_A),
+\end{align*}
+where $\theta$ is the effective per capita attack rate of a free consumer at a given level of resource density, i.e., here a constant parameter defined by $\theta:=\alpha\,\frac{n_R^0}{N}$, and $n_A^0$ is the overall number of predators (constant as well). These rates control the temporal evolution of the probability of finding $n_A$ free consumers at time $t$, $P(n_A,t)$.
+
+As $t \rightarrow \infty$, the distribution $P(n_A,t)$ may tend to a stationarity. Let $P(n_A)$ be this stationary distribution. We show in the Supplementary Information that
+\begin{equation}
+    P(n_A) = \binom{n_A^0}{n_A}\,p^{n_A}(1-p)^{n_A^0-n_A} \quad\text{with}\quad
+    p = \frac{1}{1 + \frac{\alpha}{\nu} \frac{n_R^0}{N}}.\tag{B1}
+    \label{eq:binom}
+\end{equation}
+Therefore, we obtain that the stochastic variable $n_A$ follows the binomial distribution at stationarity for Holling Type II feeding dynamics.
+\end{tcolorbox}
+
+\subsection{A Consumer Feeding on a Logistic-growing Resource}
+In this example, the consumer species can be either a predator or a herbivore feeding on either a prey species or a plant resource, respectively. Suppose that the resource grows logistically to certain carrying capacity, and is the food for a consumer species. This introduces a second source of mortality into the resource population. We will assume that resource dynamics is rapid enough in comparison to consumption dynamics to consider that consumer population is not effectively changing. Thus, it can be considered as a time independent parameter, $y$. Furthermore, as explained in section \ref{MMkin}, we will assume that the per capital predator-induced mortality of prey individuals, as being consumed by an average predator, is given by a Holling II functional response:
+\begin{equation}
+f(n) = \frac{a}{1+a\tau\,n}\,,
+\end{equation}
+where $\tau$ is the handling time and $a$ is the per capita rate of prey consumption by an average predator individual when prey population is very low. Parameter $a$ is the encounter rate between predator and prey individuals. The relative mortality effect of predators on prey population actually drops as prey population increases, due to a saturation effect in the predator consumption capacity. Thus, when we write the transition probability of a prey population of size $n$ loosing one individual due to natural or predator-induced mortality by a population of $y$ predators, we should consider:
+\begin{equation}
+\label{r_2}
+r_{n}  =  \left(\delta + \frac{a\,y}{1+a\tau\,n}\right)\,n 
+\end{equation}
+On the other hand, we will assume that there is a {\em  propagule rain} \citep{Gotelli93} supporting prey population, which represents a mainland effect, i.e, an independent source of individual prey as a result of external immigration from a mainland. Since we can assume that each prey individual occupies certain physical area, the maximum number of resource items that can be packed in a given area is limited. In this case, external immigration will be also limited by empty space availability. It will be zero when resource population reaches this potentially maximum packing, $N$, and it can be assumed to be proportional to the amount of free space still available to accommodate more prey individuals when $n < N$. This mainland effect ensures the maintenance of predator population even when prey reproduction by itself could not maintain predators in isolation. As a result, the growth transition rate has two contributions
+\begin{equation}
+g_{n} = \beta\,n\left(1-\frac{n}{N}\right)+m\,(N-n)\,,
+\label{g_2}
+\end{equation}
+where $m\,N$ is the maximum immigration rate when local prey population is zero. This is equivalent to assume that rate of arrival of prey individuals per unit area is $m$, when area in measured in terms of the unit area a prey individual occupies. Eqs. (\ref{r_2})-(\ref{g_2}) define the master equation, and, therefore, the stochastic dynamics of prey population. Alternatively, a deterministic description is also possible:
+\begin{equation}
+\label{ex_3}
+\frac{dp}{dt} = \left(\beta\,p+m\right)\left(1-p\right) - \left(\delta+\frac{\alpha\,y}{1+\alpha\tau\,p}\right)p\,,
+\end{equation}
+where $\alpha$ is redefined as $a\,N$. Formally, this model is similar to the mainland-island metapopulation analyzed by  \cite{AlonsoMcKane2002Extinction}. The non-linear feeding function precludes the use of the analytical solution found in that case. All we can do is the numerical integration of the master equation and the calculation of the steady-state probability distribution. The presence of the mainland ensures the existence of such a stationary state.
+\smallskip 
+ 
+The interesting point in this example is the existence of a predator-induced bifurcation in the behavior of the system. Three phases can be distinguished:
+\begin{enumerate}
+\item When predator pressure is low, the system behaves as it did in the previous example of simple logistic growth. The only difference is the additional predator-induced mortality. Then, there is a stationary-state defined by a one-humped probability distribution and the dynamics of the deterministic equation describes the average over stochastic realizations as well. 
+\item As predator pressure increases, due to a higher number of predators ---or, equivalently, due to more efficient predators, characterized by shorter handing times--- the distribution probability undergoes a qualitative change presenting two peaks: there is a high probability of observing the prey population about to extinction (around $n=0$) and there is also a high probability of having the prey population around some positive value ($n=n^{*}$). This involves that the average over stochastic realizations is not capturing the real behavior of the system. In this parameter regime, any initial value of prey population can evolve to one of the two branches of the probability distribution and finally set around one of the two most probable values of the distribution. Strong fluctuations can make the system flip between these values. On the other hand, the deterministic description only tells us about the existence of two possible solutions, but in order to know the relative importance of each of them the stochastic analysis becomes completely necessary.  
+\item Finally, when predator pressure increases over certain threshold the only possible solution is around $n=0$. The probability distribution peaks at this value. Any stochastic realization has a great probability of an eventual total extinction.
+\end{enumerate}
+\smallskip 
+
+These three different regimes can be studied by looking first at the case of an isolated system ($m=0$). First, we recall that, for $m \not= 0$, the following relation determines the stationary probability distribution, $P_s(n)$:
+\begin{equation}
+P_s(n) = F(n) P_s(n-1)\ ; \ n = 1,...,N\,. 
+\label{balance_2}
+\end{equation}  
+where $F(n)=g_{n-1}/{r_n}$. Notice that the condition $F(n)=1$ establishes a a qualitative change in the shape of the distribution probability. For instance, when $F(n)$ changes from $F(n)>1$ to $F(n)<1$, the shape of the distribution must change from being increasing to being decreasing. Thus, in general, the critical value $F(n)=1$ will represent either a maximum or a minimum of $P_s(n)$. In case $m=0$, there is no true steady-state, since $g_n = 0$, for $n=0$. However, this recurrence should be almost true for the quasi-stationary probability distribution as well, since $P(n,t) \approx P_c(n,t)$ provided that $P(0,t) \ll 1$ ---see also the expression of the master equation for the conditional probability, $P_c(n,t)$. In addition, given the definition of the quasi-stationary distribution, as the limit as time increases of the conditional probability distribution, extreme values of the conditional probability, $P_c(n,t)$, and the probability itself, $P(n,t)$, should approximately match. Therefore, the equation $F(n)=1$ can be used to calculate the extreme values of the quasi-stationary probability as well. This relation can be written as: 
+\begin{equation}
+\label{second}
+c - b\,n + n^2=0\,, 
+\end{equation}
+where
+\begin{eqnarray}
+\label{eq_c}
+c & = & \frac{N}{\beta\tau}\left(y - \frac{\beta-\delta}{a}\right)\\
+b & = & N\,\left(1+\frac{\delta}{\beta}\right)-\frac{1}{a\tau}
+\label{eq_b}
+\end{eqnarray}
+Besides the extreme values predicted by Eq. (\ref{second}), the probability distribution has always an extreme value at $n^{*}=0$, corresponding to the $p^{*}=0$ solution of the deterministic equation (\ref{ex_3}). Apart from this, as any second degree equation, Eq. (\ref{second}) predicts two, one or none positive solutions, resulting in two, one or none respective extreme values, and so defining the corresponding three different behaviors of the probability distribution:
+\begin{enumerate}
+\item None positive solution. This is achieved when $b^2 - 4c<0$. This condition establishes a threshold in predator population over which the probability distribution is left with only one maximum value at $n^{*}=0$. This threshold can be written as: 
+\begin{equation}
+y > y_{1} \equiv \frac{N}{4}\,\beta\tau\,\left(1-\frac{\delta}{\beta}-\frac{1}{N\tau\,a}\right)^2 + \frac{\beta-\delta}{a}
+\end{equation}   
+\item Two positive solutions. This requires $b>0$, $c>0$, and and a predator population below the threshold $y_{1}$. Since $c$ must be positive, predator population must also satisfy the condition $y > y_{2} \equiv (\beta-\delta)/a$. Therefore, for intermediate predator population values ($y_{2}<y<y_{1}$), there there is a two-humped probability distribution: $n^{*}=0$ and $n^{*}=n_{+}$ are the maxima and $n^{*}=n_{-}$ is the minimum, where $n_{+}$ and $n_{-}$ are the two positive solutions of Eq. (\ref{second}).  
+\item One positive solution. This is achieved with $y<y_{1}$ and $c<0$. The last conditions establishes can be also written as $y<y_{2}$. 
+\end{enumerate}
+For some combination of parameters, it could happen that as predator pressure decreases, the probability distribution changes from the situation where it has only a maximum value at $n^{*}=0$ (case 1) to a situation where it has also only a maximum at $n^{*}=n_{+}>0$ (case 3), without passing through the intermediate situation where it has two maximum values. Howeever, when the system is in this situation, characterized by a two-humped probability distribution at the steady-state, different stochastic realizations can diverge deeply.
+\smallskip 
+ 
+With this example, we have emphasized the relationship between the deterministic description (Eq. \ref{ex_3}), the ``macroscopic law'', and the stochastic description of the system. Stable solutions of the deterministic equation correspond to the maximum values of the steady-state probability distribution\footnote{When there is a single stationary solution for the deterministic equation, this matches the maximum value of the steady-state probability, which in turn, commonly, matches the average value over stochastic realizations, as shown in several examples. Otherwise, this is not necessary the case.}. Unstable solutions correspond to minima. Unstable solutions define boundary values separating different basins of attraction, which means that any initial condition within a basin evolves deterministically to one well-defined stable solution. The long-term temporal evolution of the system is no longer determined in terms of the averages over stochastic realizations. Due to the presence of a bifurcation, the probability distribution can have two alternative modes. In this regime, microscopic fluctuations can drive the system to one of the two alternative states as spontaneous flips between co-existing stationary states can always occur. 
+
+

@@ -1,0 +1,92 @@
+\section{Quasi-stationary distributions and extinction}
+\label{quasi-stationary}
+
+We introduce the quasi-stationary state to provide a simple, approximated method to calculate mean times to extinction in systems lacking true stationary behavior. Finally, we present a natural, formal link between deterministic and stochastic models by means of the expansion of the master equation (see subsection \ref{expansion}). Throughout this section, we present the theoretical material through simple examples.
+
+In many birth-death processes ---those characterized by $g_0=0$--- there is no stationary probability distribution. Eventually the systems goes to extinction and no further dynamics is observed. In these cases, we can define a probability distribution ---conditioned to no extinction--- which very often reaches stationary values. This is called the quasi-stationary distribution. It is mean to describe the probability of the system having $n$ individuals as long as the population has not gone to extinction yet. We can always defined a conditional probability distribution, $P_c(n,t)$, as:
+\begin{equation}
+  \label{QE_def}
+  P_c(n,t) = \frac{P(n,t)}{1-P(0,t)}
+\end{equation}
+Consistently, the quasi-stationary distribution arises from considering the limit of the last equation as time tends to infinity. A rapid look at Eq. (\ref{QE_def}) shows that such a limit is in principle undetermined. So, it must be calculated carefully. However, it is easy to calculate the temporal evolution of this conditional probability:
+\begin{equation}
+  \frac{dP_c(n,t)}{dt} =  \frac{1}{(1 - P(0,t)}\left(\frac{dP(n,t)}{dt} + P_c(n,t)\frac{dP(0,t)}{dt}\right)
+\end{equation}
+The last equation, by using the actual master equation (Eq. \ref{me_1}), can be written in the same way, as a set of ODEs from $n=1, \dots, $ with a correction term, as follows. For $n>1$,
+\begin{equation}
+  \label{QE_1}
+  \frac{dP_c(n,t)}{dt} = g_{n-1} P_c(n-1,t) + r_{n+1} P_c(n+1,t) - P_c(n,t)\left(r_n + g_n - P_c(1,t)r_1\right)
+\end{equation}
+and, for $n=1$,
+\begin{equation}
+  \label{QE_2}
+  \frac{dP_c(1,t)}{dt} = P_c(2,t) r_2 - P_c(1,t)\left(r_1 + g_1\right) + P_c^2(1,t) r_1
+\end{equation}
+
+\subsection{An iterative algorithm}
+By equating Eqs. (\ref{QE_1})-(\ref{QE_2}) to zero we can investigate the existence of a quasi-stationary solution. We can approximate the quasi-stationary distribution iteratively by the following algorithm \cite{Nisbet82}:
+\begin{enumerate}
+\item Try a guess for $P^*_c(1)$.
+\item By making Eq. (\ref{QE_2}) equal to zero estimate $P^*_c(2)$:
+  \begin{equation}
+    P^*_c(2) = \frac{(r_1+g_1)P^*_c(1) - r_1 P^*_c(1) P^*_c(1)}{r_2}
+  \end{equation}
+\item By using Eqs. (\ref{QE_1}) equalized to zero, obtain an iterative estimation of the 
+rest of values for $n>2$ up to $P^*_c(n)$ being less that an accuracy parameter $\epsilon$:
+  \begin{equation}
+    P^*_c(n) = \frac{(r_{n-1}+g_{n-1})P^*_c(n-1) - g_{n-2} P^*_c(n-2) - r_1 P^*_c(1) P^*_c(n-1)}{r_n}
+  \end{equation}
+\item Normalize the resulting conditional distribution. By so doing, get a new estimation 
+of $P^*_c(1)$. If the result differs significantly from the previous guess of $P^*_c(1)$ 
+repeat the whole process iteratively.
+\end{enumerate}
+
+We notice that the recurrence relation (\ref{balance}) is almost a solution of the system. If we introduce this recurrence into (\ref{QE_1}), we obtain:
+\begin{equation}
+  \label{QE_3}
+  \frac{dP_c(n,t)}{dt} =  - P_c(1,t)r_1\,P_c(n,t) \approx 0
+\end{equation}
+which is almost zero provided that $P_c(1,t) \approx 0$. In essence, the shape of the quasi-stationary conditional distribution matches the non-stationary total probability distribution when $P(1,t)$ is almost zero, and the rhythm at which the total probability vanishes out is proportional to $r_1$ and $P_c(1,t)$. In the next section, we will apply this conditional probability distribution to estimate the mean time to extinction.
+
+\subsection{The mean time to extinction}
+\label{T_E_Approx}
+The mean time to extinction in systems where there is no stationary state ($g_0 = 0$), given an initial population of $n_0\not=0$, the mean time to extinction can be calculated exactly for a general birth-death stochastic process characterized by $r_n$ and $g_n$ probability transition rates \citep{Nisbet82}:
+\begin{equation}
+T_E(n_0) = \sum_{i=0}^\infty q_{i} + \sum_{j=1}^{n_0-1}S_{j}\sum_{i=j+1}^\infty q_i  
+\end{equation}
+where $q_{i}$ and $S_i$ are given by:
+\begin{equation}
+q_i = \frac{g_{i-1}\dots g_{1}}{r_i\dots r{1}}\,, 
+\end{equation}
+and
+\begin{equation}
+S_i = \frac{r_{i}\dots r_{1}}{g_{i}\dots g{1}}
+\end{equation}
+
+However, although exact, the last formal expression is quite cumbersome, and may not be easy to evaluate in practical cases. The introduction to the quasi-stationary distribution allows a simpler, but approximated approach to calculate an estimate for this time. It can be obtained from the conditional probability defined in the last section. This approximation highlights the leading contribution to the average extinction time. As we will show, this time can be approximated by the inverse of $r_1\,P_c^{*}(1)$, where $P_c^{*}(1)$ is the quasi-stationary value of the conditional probability $P_c(n,t)$ for $n=1$, and $r_1$ is the death rate of the last individual in the system. 
+
+Since the $P(0,t)$ is the probability of having no population at time $t$, it can be regarded as the probability distribution function for the random variable ``time to extinction'', $T_E$. In other words, the probability of total extinction having occurred at certain time, $T_E < t$, is exactly given by the function $P(0,t)$. Therefore, 
+\begin{equation}
+Pr\{T_E < t\} = P(0,t).
+\end{equation}  
+We can then calculate the expected extinction time as:
+\begin{equation}
+\langle T_E \rangle = \int_0^{\infty}t\,\frac{dP(0,t)}{dt}\,dt
+\end{equation}
+By integrating by parts the last equation can be written as:
+\begin{equation}
+\langle T_E \rangle = \int_0^{\infty}\left(1-P(0,t)\right)\,dt
+\end{equation}
+The integrand of the last equation can be approximated by using the quasi-stationary probability. Notice that, by using the definition of the conditional  probability $P_c(n,t)$, we have:
+\begin{equation}
+\frac{dP(0,t)}{dt}=r_1\,P(1,t)=r_1\,P_c(1,t)\,(1-P(0,t))\approx r_1\,P_c^{*}(1)\,(1-P(0,t))
+\end{equation}
+The last differential equation, although approximated, can be solved, which gives the following approximate expression:
+\begin{equation}
+1-P(0,t) \approx A\exp(-r_1P_c^{*}(1)\,t)
+\end{equation}  
+The initial condition tell us that $A=1$. So, $P(0,t) \approx 1 -\exp(-r_1\,P_c^{*}(1)\,t)$, which gives the approximated expression for mean extinction time as we promise to show: 
+\begin{equation}
+\langle T_E \rangle \approx \int_0^{\infty}\exp(-r_1\,P_c^{*}(1)\,t)\,dt=\frac{1}{r_1\,P_c^{*}(1)}
+\end{equation}
+

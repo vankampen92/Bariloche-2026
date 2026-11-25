@@ -1,0 +1,118 @@
+\section{Basic Concepts, Definitions, and Examples}
+\label{sec:basic_concepts}
+
+This section briefly reviews probability concepts needed to describe stochastic processes in continuous time. The main idea is simple: rather than predicting a unique outcome, we characterize the possible outcomes of a random experiment and the probability assigned to each of them. Later, our random variables will be populations, numbers of infection events, or waiting times between elementary ecological events.
+
+\subsection{Random variables and probability distributions}
+
+\subsubsection{Random variables}
+A \emph{random variable}\footnote{Random variables are also called random quantities, aleatory variables, or stochastic variables} $X$ assigns a numerical value to each outcome of a random experiment. Observing the experiment gives a \emph{realization} $x$ of $X$. For example, we might count the number of individuals arriving on an island during an hour, or record the time until the next arrival. Both outcomes may vary between otherwise identical realizations of the same experiment. The \emph{support} is the set of values the variable can take with nonzero probability.
+
+A distinction that will be especially useful later is between a \emph{random variable} $X$ and a \emph{stochastic process} $\{X(t):t\geq 0\}$: the latter is a family of random variables indexed by time. In a population model, $X(t)$ may denote the number of individuals present at time $t$.
+
+An empirical approach to characterize a random variable is to obtain a large number of independent observations (realizations) and record the corresponding outcomes. The resulting empirical frequency distribution---commonly represented as a histogram---converges, in the limit of infinitely many realizations and under appropriate regularity assumptions, to the underlying probability distribution of the random variable.
+
+Random variables can be either integer-valued (discrete) or real-valued (continuous) random variables . Their full characterization through a probability distribution differs slightly.
+
+\subsubsection{Discrete random variables}
+Suppose $X$ takes nonnegative integer values, with
+\begin{equation}
+ p_n=\Pb\{X=n\},\qquad n=0,1,2,\ldots,\qquad
+ p_n\geq 0,\quad \sum_{n=0}^{\infty}p_n=1.
+ \label{eq:basic_discrete}
+\end{equation}
+The collection $\{p_n\}$ is the \emph{probability mass function}\footnote{Also called {\em probability function}} (PMF) of $X$. Its expectation and variance, when they exist, are
+\begin{equation}
+ \E[X]=\sum_{n=0}^{\infty}np_n,\qquad
+ \operatorname{Var}(X)=\E[X^2]-\E[X]^2.
+ \label{eq:basic_moments}
+\end{equation}
+Three important examples are:
+\begin{align}
+ \text{Poisson:}\quad &p_n=e^{-\theta}\frac{\theta^n}{n!}, &&n\geq 0,\ \theta>0;\label{eq:basic_poisson}\\
+ \text{Binomial:}\quad &p_n=\binom{N}{n}p^n(1-p)^{N-n}, &&0\leq n\leq N;\\
+ \text{Geometric:}\quad &p_n=p(1-p)^{n-1}, &&n\geq 1,\ 0<p\leq1.
+ \label{eq:basic_geometric}
+\end{align}
+
+The Binomial distribution is a two-parameter distribution because it becomes fully defined by specifying two parameters ($N$ and $p$), while the Poissonian and the geometric distribution are one-parametric probability distributions. The geometric convention here counts the trial on which the first success occurs, so its support starts at one. The Poisson parameter $\theta$ is the \emph{expected count}, not necessarily a rate: later, for a counting process with constant arrival rate $\lambda$ observed for time $t$, we will have $\theta=\lambda t$.
+
+\subsubsection{Continuous random variables}
+A real-valued random variable with a probability density function (PDF) $f(x)$ satisfies
+\begin{equation}
+ \Pb\{a<X\leq b\}=\int_a^b f(x)\,dx,\qquad
+ f(x)\geq0,\quad\int_{-\infty}^{\infty}f(x)\,dx=1.
+\end{equation}
+A density is \emph{not} itself a probability: for a continuously distributed $X$, $\Pb\{X=x\}=0$ at any individual point. The cumulative distribution function (CDF) is
+\begin{equation}
+ F(x)=\Pb\{X\leq x\}=\int_{-\infty}^{x}f(u)\,du,
+ \qquad f(x)=\frac{dF(x)}{dx}
+ \label{eq:basic_cdf}
+\end{equation}
+at points where the derivative exists. If $X$ has support on $[0,\infty)$, the lower integration limit can be replaced by zero.
+
+Two distributions are particularly relevant:
+\begin{align}
+ \text{Gaussian:}\quad &f(x)=\frac{1}{\sqrt{2\pi\sigma^2}}
+ \exp\!\left[-\frac{(x-\mu)^2}{2\sigma^2}\right],\\
+ \text{Exponential:}\quad &f(t)=\lambda e^{-\lambda t},\qquad t\geq0,\ \lambda>0.
+ \label{eq:basic_exponential_pdf}
+\end{align}
+For the exponential random variable $T$, representing a waiting time,
+\begin{equation}
+ F_T(t)=1-e^{-\lambda t},\qquad
+ \Pb\{T>t\}=e^{-\lambda t},\qquad
+ \E[T]=\frac{1}{\lambda}.
+ \label{eq:basic_exp_waiting}
+\end{equation}
+The last expression, the \emph{survival probability}, will play a central role in deriving exact stochastic simulation algorithms. Notice the difference between the mean waiting time $1/\lambda$ and the rate $\lambda$.
+
+\subsection{Probability generating functions}
+\label{sec:basic_pgf}
+Probability generating functions (PGFs) encode the entire distribution of a nonnegative integer-valued (or discrete random) variable $X$ in a single function:
+\begin{equation}
+ G(z)=\sum_{n=0}^{\infty}p_nz^n =\E[z^X], \qquad |z|\leq1.
+ \label{GenFunc_Def}
+\end{equation}
+The variable $z$ is oly an auxiliary argument. Since probabilities sum to one, $G(1)=1$. Differentiating term by term (with respect to $z$) gives
+\begin{equation}
+ G'(1)=\sum_{n\geq0}np_n=\E[X],\qquad
+ G''(1)=\sum_{n\geq0}n(n-1)p_n=\E[X(X-1)].
+\end{equation}
+Therefore,
+\begin{equation}
+ \boxed{\operatorname{Var}(X)=G''(1)+G'(1)-[G'(1)]^2.}
+ \label{eq:basic_pgf_variance}
+\end{equation}
+These equalities assume that the indicated moments exist. For example, if $X$ is Poisson with mean $\theta$,
+\begin{equation}
+ G(z)=\exp[\theta(z-1)],\qquad
+ \E[X]=\operatorname{Var}(X)=\theta.
+\end{equation}
+
+\paragraph{Sums of independent random variables.}
+If $X$ and $Y$ are \emph{independent} nonnegative integer-valued random variables and $Z=X+Y$, then
+\begin{equation}
+ G_Z(z)=G_X(z)G_Y(z).
+ \label{eq:basic_pgf_product}
+\end{equation}
+In particular, the sum of $N$ independent Bernoulli variables with success probability $p$ is binomial, since $G_X(z)=1-p+pz$ and $G_Z(z)=(1-p+pz)^N$.
+
+\paragraph{Random sums (compounding).}
+Let $N$ be a nonnegative integer-valued random variable and let $X_1,X_2,\ldots$ be independent and identically distributed nonnegative integer-valued random variables, \emph{independent also of $N$}. For $S=\sum_{i=1}^{N}X_i$ (with $S=0$ if $N=0$), conditioning on $N$ gives
+\begin{equation}
+ G_S(z)=\E\big[(G_X(z))^N\big]=G_N\big(G_X(z)\big).
+ \label{eq:basic_compound}
+\end{equation}
+The first identity illustrates the general lesson: when calculating properties of random variables, assumptions about independence must be explicit.
+
+\subsection{Exercises}
+\label{sec:basic_exercises}
+\begin{enumerate}[label=\textbf{Exercise \arabic*.},leftmargin=*]
+ \item \textbf{Poisson counts.} Let $X\sim\mathrm{Poisson}(\theta)$. Verify that $\sum_n\Pb\{X=n\}=1$ and use its PGF to calculate $\E[X]$ and $\operatorname{Var}(X)$. What is the probability of observing no arrivals during an interval of length $t$ if events occur at rate $\lambda$?
+ \item \textbf{Waiting times.} Starting from $F_T(t)=1-e^{-\lambda t}$, calculate the density, mean, and survival probability of $T$. Show that $\Pb\{T>s+t\mid T>s\}=\Pb\{T>t\}$ for $s,t\geq0$, and interpret the result.
+ \item \textbf{Binomial distributions from PGFs.} Derive the PGF of a Bernoulli variable and show that the sum of $N$ independent Bernoulli variables is binomial. Calculate its mean and variance using derivatives of the PGF.
+ \item \textbf{Two independent populations.} Suppose $X\sim\mathrm{Poisson}(\alpha)$ and $Y\sim\mathrm{Poisson}(\beta)$ independently. Find the PGF and the distribution of $X+Y$. Explain why independence matters.
+ \item \textbf{Optional challenge: a compound process.} Suppose $N\sim\mathrm{Poisson}(\theta)$ is the number of arriving groups, and each group contains exactly two individuals. Find the PGF of the total number of arriving individuals and its mean and variance. Is the total Poisson distributed?
+\end{enumerate}
+

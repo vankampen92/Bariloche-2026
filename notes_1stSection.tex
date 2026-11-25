@@ -1,0 +1,94 @@
+\section{Basic Concepts, Definitions, and Examples}
+
+\subsection{Random variables and probability distributions}
+
+\subsubsection{Random Variables}
+Conceptually, random variables are variables taking values as a result of an experiment or an observation. Making an observation of a system, this is, measuring a property of it, is realizing a random variable. Two temperature measures of a system will never coincide exactly. There is always some uncertainty. These two measures belong to a set of possible values. Temperature is then a random variable and the two particular measured values are two different realizations (or instances) of the random variable {\it temperature}. More generally, a {\it random variable}\footnote{Random variables are also called random quantities, aleatory variables, or stochastic variables} is a variable whose possible values are outcomes of a random phenomenon. The action of observing the state of a system by taking a measure of it (for instance, {\it temperature}) can be regarded as a random phenomenon. However, in nature, random phenomena are always constrained, this is, in general, a random variable cannot take all possible values nor are they equally likely. The art is to characterize and quantify how different constraints come into play.  
+\smallskip
+
+\subsubsection{Probability Distributions}
+First of all, we need to carefully characterize a random variable by analyzing the set of possible outcomes that the random variable can take. This is accomplished with the so-called {\it probability distribution}. An empirical way to characterize a random variable is then just to realize it as many times as possible, and record carefully its output values. In the case of temperature, we would need to measure the temperature of the system as many times as possible until figuring out the relative frequency of all possible outcomes. Since some values are more frequent than others, we say that the whole probability is distributed all over these values. This histogram is, in the limit of infinite realizations, the probability distribution associated to the random variable. Its support is the set of possible values the random variable can take. 
+\smallskip
+
+Random variables can be either integer-valued or real-valued random variables. Their full characterization through a probability distribution differs slightly. 
+\smallskip
+
+{\bf Integer-valued random variables.} The full characterization of an integer-valued random variable is given by the set of probabilities associated to the different outcome values the variable can take. In this case, this set is the probability distribution of the random variable. We say a random variable $X$ {\it follows} certain probability distribution. More precisely, let us assume the random variable $X$ can take all positive integer values starting at zero, then its associated probability distribution will be given by the following set: 
+\begin{equation}
+p_0, p_1, \dots, p_n, \dots
+\end{equation}
+In mathematics, the set of $p_j$ values with $j=0,1,\dots$ are called a series. Of course, they only form a probability distribution if they sum to 1: $\sum_{j=0}^{\infty} p_j = 1$. This is the normalization condition. For most important integer-valued random variables, the series of $p_j$ values follow certain generating formula. A very important integer-valued random variable is the Poissonian random variable. In that case, the formula for the $p_j$'s is given by:
+\begin{equation}
+    p_n = \frac{\lambda^n}{n!} \exp(-\lambda)
+\end{equation}
+Another common example is the binomial random variable, whose associated distribution is given by:
+\begin{equation}
+    p_n = \binom{N}{n} p^n (1-p)^{(N-n)}
+\end{equation}
+Finally, the probability distribution for a geometric random variable with parameters $p$ and $q$ ($q = 1-p$) is given by:
+\begin{equation}
+    P(n,t) = p\,q^{n-1}
+\end{equation}
+The Binomial distribution is a two-parameter distribution because it becomes fully defined by specifying two parameters ($N$ and $p$), while the Poissonian and the geometric distribution are one-parametric. Sometimes we will write $X \sim Poisson(\lambda)$ (or $X \sim Binomial(N,p)$) to express that the random variable $X$ follows a Poissonian (or a Binomial) distribution. 
+\smallskip
+
+{\bf Real-valued random variables.} Central to the full characterization of these kind of variables is the probability density function. A real-valued random variable, $X$, can take any real value, $x \in \cal{R}$. Technically, the probability density function only represents probabilities as an {\it integral under the curve}. We write the probability of a random variable $X$ being between values $x_0$ and $x_1$ in terms of the probability density function, $f(x)$, as follows:
+\begin{equation}
+    \Pb\{ x_0 < X < x_1 \} = \int_{x_0}^{x_1} f(x)dx
+\end{equation}
+One can regard the probability density as the histogram we were previously talking about, in the limit of the infinite realizations of the random variable $X$. Therefore, if we assume that the support of the probability density is only the positive reals including the zero, then we can define the so-called cumulative probability distribution (or, for short, probability distribution) as:
+\begin{equation}
+    \Pb\{ X < x \} = \int_{0}^{x} f(u)du \equiv F(x)
+    \label{Eq:primitive}
+\end{equation}
+
+Since the integral of a function is a new function ---called its primitive--- that, once is derived, the function to be integrated ---called the integrand--- is recovered, Eq (\ref{Eq:primitive}) involves that the density and the cumulative distribution functions are related by a simple differentiation operation:
+\begin{equation}
+    \frac{dF}{dx} = f(x)
+\end{equation} 
+\smallskip
+
+Two relevant examples of real-valued random variable are the Gaussian and the exponential random variable. A random variable $X$ follows a Gaussian distribution if and only if its probability density is given by the Gaussian curve:
+\begin{equation}
+    f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left[-\frac{(x-\mu)^2}{2\,\sigma^2}\right] 
+\end{equation}
+\small
+
+A random variable, $T$, follows the exponential distribution if and only if the probability that this variable is lower than certain threshold value $t$ is given by: 
+\begin{equation}
+    \Pb\{ T < t \} = 1 - \exp (-\lambda t)
+    \label{Exponential_Distribution}
+\end{equation}
+which is its cumulative distribution function. It can be checked then that the associated probability density function of an exponentially distributed random variable is: 
+\begin{equation}
+    f(t) = \lambda \exp (-\lambda t)
+\end{equation}
+
+\subsubsection{Probability Generating Functions} 
+Probability generating functions are an extremely useful way to characterize integer-valued random variables. They encapsulate the full set of probability values, $p_j$ for $j=0, 1, \dots$ in just one function. As explained, this full set defines the probability distribution that characterizes completely the integer-valued random variable. More precisely, given a random variable $X$ such that $\Pb[X=j] = p_j$, the probability generating function is defined as 
+
+\begin{equation}
+    G(x) = \sum_{j=0}^{\infty}p_j x^j 
+    \label{GenFunc_Def}
+\end{equation}
+
+Note that we can easily calculate the expected value
+\begin{equation}
+    G'(1) = \sum_{n=1}^{\infty} p_n n x^{n-1} = \sum_{n=0}^{\infty} n p_n = \E[X]
+\end{equation}
+and similarly higher moments (variance, etc.).\footnote{The calculation of the variance was shown in class}  
+%\ruby{More explanation here. Explicit description of how the equation for variance can be found using the generating function.}
+\bigskip
+
+\textbf{Some useful facts are:} \\
+
+\begin{easylist}[itemize]
+& Example: Convolution (sums)
+    && Let $X$ and $Y$ be random variables with probability generating functions $G_X(u)$ and $G_Y(u)$ respectively. Consider the random variable $Z = X + Y$. A useful fact is that $G_Z(u) = G_X(u)G_Y(u)$. 
+    && Suppose $Z_n = X_1 + \cdots + X_n$ is the sum of $n$ independent identically distributed random variables, with generating function $G_X(u)$. Then $G_{Z_n}(u) = [G_X(u)]^n$. For example, consider Bernoulli distributed $X_i$. Using the form of the generating function, we find that $Z_n$ is binomially distributed.
+& Example: Compound (composite)
+    && Suppose $Z_N = X_1 + \cdots + X_n$ is the sum of $N$ independent identically distributed random variables $X_i$. Now let $N$ be a random variable with generating function $G_N(u)$. Then $G_{Z_N}(u) = G_N(G_X(u))$. 
+\end{easylist}
+\bigskip
+
+To demonstrate the facts above, we make use of probability generating functions\footnote{The mathematical demonstrations of these properties were not carried out in class, but you should still remember them}. 

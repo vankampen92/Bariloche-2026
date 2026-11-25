@@ -1,0 +1,150 @@
+% ===============================================
+% ECEV 33400: Stochastic Processes      Fall 2017
+% notes.tex
+% Template for class notes
+% ===============================================
+
+
+% -----------------------------------------------
+% The preamble that follows can be ignored. Go on
+% down to the section that says "START HERE" 
+% -----------------------------------------------
+
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage[ampersand]{easylist}
+\usepackage[sectionbib]{natbib}
+\usepackage{todonotes}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{{\mathbb F}}
+\newcommand{\Pb}{{\mathbb P}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\Frac}[2]{\left(\frac{#1}{#2}\right)}
+\newcommand{\Eval}[2]{\big|_{#1}^{#2}}
+\newcommand{\intinf}{\int_{-\infty}^{\infty}}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\newenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+
+
+\begin{document}
+
+% ------------------------------------------ %
+%                 START HERE                 %
+% ------------------------------------------ %
+
+\title{Section 3 Notes} % Replace X with the appropriate number
+\author{ECEV 33400: Stochastic Processes in Continuous Time  \\ Fall Quarter -- David Alonso} % Replace  "\iffalse X \fi" with your name.
+\date{10/05/2017, 10/12/2017} % Don't change this! :( 
+
+\maketitle
+
+% -----------------------------------------------------
+% Notes from Class 
+% -----------------------------------------------------
+\setcounter{section}{1}
+
+\section{Simple Applications}
+We present here a number of worked examples to show how to apply the theory and methods developed so far to simple ecological problems. These applications are simple but relevant and have strongly influenced recent developments of ecological theory. Most of them can be framed in terms of the dynamics of a one-dimensional variable that is used to describe the state of the system at any given time. First, we revisit the immigration-birth-death model by Kendall \cite{Kendall48}. This model considers per capita density-independent rates, and, therefore, can be written in terms of a one-step, linear process. The immigration from outside the system is the key process to show that the typical scaling with exponent -1 obtained in species abundance distributions can be recovered from that model in a certain limit. Then, we revisit Michaelis-Menten kinetics. The accurate stochastic description of this system requires a multidimensional master equation, which will be the focus of next chapters. Here, our analysis will be only used to motivate that the rate of prey consumption per a predator individual corresponds to Holling type II functional response. This result paves the way to analyze a density-dependent population model of a consumer feeding on a logistic-growing resource. Finally, we introduce the most simple stochastic model underlying Island Biogegraphy Theory \cite{MacArthur67}.  
+
+\subsection{The logseries and the Immigration-Birth-Death Process}
+
+
+\subsection{Michaelis-Menten kinetics}
+\label{MMkin}
+
+
+\subsection{Logistic Growth}
+
+
+\subsection{A Consumer Feeding on a Logistic-growing Resource}
+In this example, the consumer species can be either a predator or a herbivore feeding on either a prey species or a plant resource, respectively. Suppose that the resource grows logistically to certain carrying capacity, and is the food for a consumer species. This introduces a second source of mortality into the resource population. We will assume that resource dynamics is rapid enough in comparison to consumption dynamics to consider that consumer population is not effectively changing. Thus, it can be considered as a time independent parameter, $y$. Furthermore, as explained in section \ref{MMkin}, we will assume that the per capital predator-induced mortality of prey individuals, as being consumed by an average predator, is given by a Holling II functional response:
+\begin{equation}
+f(n) = \frac{a}{1+a\tau\,n}\,,
+\end{equation}
+where $\tau$ is the handling time and $a$ is the per capita rate of prey consumption by an average predator individual when prey population is very low. Parameter $a$ is the encounter rate between predator and prey individuals. The relative mortality effect of predators on prey population actually drops as prey population increases, due to a saturation effect in the predator consumption capacity. Thus, when we write the transition probability of a prey population of size $n$ loosing one individual due to natural or predator-induced mortality by a population of $y$ predators, we should consider:
+\begin{equation}
+\label{r_2}
+r_{n}  =  \left(\delta + \frac{a\,y}{1+a\tau\,n}\right)\,n 
+\end{equation}
+On the other hand, we will assume that there is a {\em  propagule rain} \citep{Gotelli93} supporting prey population, which represents a mainland effect, i.e, an independent source of individual prey as a result of external immigration from a mainland. Since we can assume that each prey individual occupies certain physical area, the maximum number of resource items that can be packed in a given area is limited. In this case, external immigration will be also limited by empty space availability. It will be zero when resource population reaches this potentially maximum packing, $N$, and it can be assumed to be proportional to the amount of free space still available to accommodate more prey individuals when $n < N$. This mainland effect ensures the maintenance of predator population even when prey reproduction by itself could not maintain predators in isolation. As a result, the growth transition rate has two contributions
+\begin{equation}
+g_{n} = \beta\,n\left(1-\frac{n}{N}\right)+m\,(N-n)\,,
+\label{g_2}
+\end{equation}
+where $m\,N$ is the maximum immigration rate when local prey population is zero. This is equivalent to assume that rate of arrival of prey individuals per unit area is $m$, when area in measured in terms of the unit area a prey individual occupies. Eqs. (\ref{r_2})-(\ref{g_2}) define the master equation, and, therefore, the stochastic dynamics of prey population. Alternatively, a deterministic description is also possible:
+\begin{equation}
+\label{ex_3}
+\frac{dp}{dt} = \left(\beta\,p+m\right)\left(1-p\right) - \left(\delta+\frac{\alpha\,y}{1+\alpha\tau\,p}\right)p\,,
+\end{equation}
+where $\alpha$ is redefined as $a\,N$. Formally, this model is similar to the mainland-island metapopulation analyzed by Alonso and McKane \cite{Alonso02}. The non-linear feeding function precludes the use of the analytical solution found in that case. All we can do is the numerical integration of the master equation and the calculation of the steady-state probability distribution. The presence of the mainland ensures the existence of such a stationary state.
+\smallskip 
+ 
+The interesting point in this example is the existence of a predator-induced bifurcation in the behavior of the system. Three phases can be distinguished:
+\begin{enumerate}
+\item When predator pressure is low, the system behaves as it did in the previous example of simple logistic growth. The only difference is the additional predator-induced mortality. Then, there is a stationary-state defined by a one-humped probability distribution and the dynamics of the deterministic equation describes the average over stochastic realizations as well. 
+\item As predator pressure increases, due to a higher number of predators ---or, equivalently, due to more efficient predators, characterized by shorter handing times--- the distribution probability undergoes a qualitative change presenting two peaks: there is a high probability of observing the prey population about to extinction (around $n=0$) and there is also a high probability of having the prey population around some positive value ($n=n^{*}$). This involves that the average over stochastic realizations is not capturing the real behavior of the system. In this parameter regime, any initial value of prey population can evolve to one of the two branches of the probability distribution and finally set around one of the two most probable values of the distribution. Strong fluctuations can make the system flip between these values. On the other hand, the deterministic description only tells us about the existence of two possible solutions, but in order to know the relative importance of each of them the stochastic analysis becomes completely necessary.  
+\item Finally, when predator pressure increases over certain threshold the only possible solution is around $n=0$. The probability distribution peaks at this value. Any stochastic realization has a great probability of an eventual total extinction.
+\end{enumerate}
+\smallskip 
+
+These three different regimes can be studied by looking first at the case of an isolated system ($m=0$). First, we recall that, for $m \not= 0$, the following relation determines the stationary probability distribution, $P_s(n)$:
+\begin{equation}
+P_s(n) = F(n) P_s(n-1)\ ; \ n = 1,...,N\,. 
+\label{balance_2}
+\end{equation}  
+where $F(n)=g_{n-1}/{r_n}$. Notice that the condition $F(n)=1$ establishes a a qualitative change in the shape of the distribution probability. For instance, when $F(n)$ changes from $F(n)>1$ to $F(n)<1$, the shape of the distribution must change from being increasing to being decreasing. Thus, in general, the critical value $F(n)=1$ will represent either a maximum or a minimum of $P_s(n)$. In case $m=0$, there is no true steady-state, since $g_n = 0$, for $n=0$. However, this recurrence should be almost true for the quasi-stationary probability distribution as well, since $P(n,t) \approx P_c(n,t)$ provided that $P(0,t) \ll 1$ ---see also the expression of the master equation for the conditional probability, $P_c(n,t)$. In addition, given the definition of the quasi-stationary distribution, as the limit as time increases of the conditional probability distribution, extreme values of the conditional probability, $P_c(n,t)$, and the probability itself, $P(n,t)$, should approximately match. Therefore, the equation $F(n)=1$ can be used to calculate the extreme values of the quasi-stationary probability as well. This relation can be written as: 
+\begin{equation}
+\label{second}
+c - b\,n + n^2=0\,, 
+\end{equation}
+where
+\begin{eqnarray}
+\label{eq_c}
+c & = & \frac{N}{\beta\tau}\left(y - \frac{\beta-\delta}{a}\right)\\
+b & = & N\,\left(1+\frac{\delta}{\beta}\right)-\frac{1}{a\tau}
+\label{eq_b}
+\end{eqnarray}
+Besides the extreme values predicted by Eq. (\ref{second}), the probability distribution has always an extreme value at $n^{*}=0$, corresponding to the $p^{*}=0$ solution of the deterministic equation (\ref{ex_3}). Apart from this, as any second degree equation, Eq. (\ref{second}) predicts two, one or none positive solutions, resulting in two, one or none respective extreme values, and so defining the corresponding three different behaviors of the probability distribution:
+\begin{enumerate}
+\item None positive solution. This is achieved when $b^2 - 4c<0$. This condition establishes a threshold in predator population over which the probability distribution is left with only one maximum value at $n^{*}=0$. This threshold can be written as: 
+\begin{equation}
+y > y_{1} \equiv \frac{N}{4}\,\beta\tau\,\left(1-\frac{\delta}{\beta}-\frac{1}{N\tau\,a}\right)^2 + \frac{\beta-\delta}{a}
+\end{equation}   
+\item Two positive solutions. This requires $b>0$, $c>0$, and and a predator population below the threshold $y_{1}$. Since $c$ must be positive, predator population must also satisfy the condition $y > y_{2} \equiv (\beta-\delta)/a$. Therefore, for intermediate predator population values ($y_{2}<y<y_{1}$), there there is a two-humped probability distribution: $n^{*}=0$ and $n^{*}=n_{+}$ are the maxima and $n^{*}=n_{-}$ is the minimum, where $n_{+}$ and $n_{-}$ are the two positive solutions of Eq. (\ref{second}).  
+\item One positive solution. This is achieved with $y<y_{1}$ and $c<0$. The last conditions establishes can be also written as $y<y_{2}$. 
+\end{enumerate}
+For some combination of parameters, it could happen that as predator pressure decreases, the probability distribution changes from the situation where it has only a maximum value at $n^{*}=0$ (case 1) to a situation where it has also only a maximum at $n^{*}=n_{+}>0$ (case 3), without passing through the intermediate situation where it has two maximum values. Howeever, when the system is in this situation, characterized by a two-humped probability distribution at the steady-state, different stochastic realizations can diverge deeply.
+\smallskip 
+ 
+With this example, we have emphasized the relationship between the deterministic description (Eq. \ref{ex_3}), the ``macroscopic law'', and the stochastic description of the system. Stable solutions of the deterministic equation correspond to the maximum values of the steady-state probability distribution\footnote{When there is a single stationary solution for the deterministic equation, this matches the maximum value of the steady-state probability, which in turn, commonly, matches the average value over stochastic realizations, as shown in several examples. Otherwise, this is not necessary the case.}. Unstable solutions correspond to minima. Unstable solutions define boundary values separating different basins of attraction, which means that any initial condition within a basin evolves deterministically to one well-defined stable solution. The long-term temporal evolution of the system is no longer determined in terms of the averages over stochastic realizations. Due to the presence of a bifurcation, the probability distribution can have two alternative modes. In this regime, microscopic fluctuations can drive the system to one of the two alternative states as spontaneous flips between co-existing stationary states can always occur. 
+
+\subsection{The Stochastic Theory of Island Biogeography Theory}
+
+
+% -----------------------------------------------
+% Ignore everything that appears below this.
+% -----------------------------------------------
+\bibliography{ecology_david}
+\bibliographystyle{unsrt}
+
+\end{document}

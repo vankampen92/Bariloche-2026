@@ -1,0 +1,45 @@
+\subsection{Metapopulation Dynamics (Alonso and McKane, 2002)}
+A metapopulation is a number of local populations or patches connected by colonization\cite{Alonso02,Levins69}. Consider $N$ patches. Each local patch can be either occupied by a given species $A$ or totally free.  Consider the dynamics defined by the following elemental stochastic events: 
+\begin{center}
+\begin{tabular}{ l c c c  c }                   
+          & Event                          & \multicolumn{2}{c}{Configuration change}  &  {\em Per capita} probability rate \\ 
+\hline
+{\bf Extinction:}  & $A  \longrightarrow \emptyset$ &  $n \longrightarrow n - 1$ & $n_0 \longrightarrow n_0 + 1$  &  $e$ \\
+%\hline
+
+{\bf Immigration:}  & $\emptyset \longrightarrow A$  &  $n \longrightarrow n + 1$ & $n_0 \longrightarrow n_0 - 1 $ &  $\lambda$ \\
+%\hline
+
+{\bf Colonization:}  & $A + \emptyset \longrightarrow A + A$ & $n \longrightarrow n + 1$ & $n_0 \longrightarrow n_0 - 1$  &  $c\frac{n_0}{N}$ \\
+%\hline
+\end{tabular}
+\end{center}
+where $n$ and $n_0$ represent the number of occupied and unoccupied patches, respectively, $\emptyset$ represents a single unoccupied patch, $e$ is the extinction rate, $\lambda$ is an immigration rate, and $c$ is the patch colonization rate when the system is almost empty ($n_0 \rightarrow N$).
+\begin{enumerate}
+\item Discuss briefly why the stochastic transition rates driving metapopulation dynamics are given by:
+\begin{align*}
+g_n &= c\,n (1 - \frac{n}{N}) + \lambda (N - n) \\
+r_n &= e\,n 
+\end{align*}
+\item Write the master equation governing the stochastic dynamics of the system and show that, on average, the fraction of occupied patches ($p$, occupancy) follows the deterministic equation:
+\begin{equation}
+\frac{dp}{dt} = c p (1 - p) - e p + \lambda (1-p) 
+\label{Levins}
+\end{equation}
+where $p$ is the fraction of occupied patches at a given time $t$. 
+\item Find the matrix, $M$, that transforms the set of $N+1$ ODEs defining the master equation into the following equation:
+\begin{equation*}
+\frac{d}{dt} \vec{P} = M \vec{P}
+\end{equation*}
+where $\vec{P}$ is an $(N+1)$-dimensional column vector whose elements are the probabilities $P(0,t), \dots, P(N,t)$. Use matrix algebra to calculate numerically the probability distribution at the stationary state.  
+\item Show that the stationary probability distribution\footnote{Recall that the Gamma function can be regarded as an extension of the factorial function, which can only operate on integers, but acting instead on real numbers: $\Gamma(x+n) = (x+n-1)(x+n-2) \cdots (x+1)x\Gamma(x)$. If fact, notice that $\Gamma(n+1) = n!$, since, by definition, $\Gamma(1)\equiv\int_0^{\infty} e^{-t}dt$.} can be given by:
+\begin{equation*}
+	P_s(n) = \binom{N}{n} \frac{\Gamma(n+y)}{\Gamma(y)} \, x^n P_s(0)
+\end{equation*}
+where the compound parameters $x$ and $y$ are given by:
+\begin{align*}
+x  &= \frac{1}{N}\frac{c}{e} \\
+y  &= N\,\frac{\lambda}{c}
+\end{align*}
+\item By using the Gillespie's algorithm, calculate the curve for the temporal evolution of the average number of occupied patches, $\langle n \rangle$, over stochastic replicates. Calculate also the deterministic evolution of the quantity $N\,p$, where $p$ stands for the fraction of occupied patches, as obtained by numerical integration of the deterministic equation (see Eq. \ref{Levins}). Use the empty metapopulation as the initial condition. Show that both curves match.  
+\end{enumerate}

@@ -1,0 +1,411 @@
+% -----------------------------------------------------
+% Notes from Class 
+% -----------------------------------------------------
+
+\section{Stochastic Methods}
+\subsection{The Master Equation Approach}
+This section is an introduction to the use of the master equation and related methods in the context of population and community ecology. We focus on one-step stochastic process in continuous time. These processes ---also known as birth-death processes--- are a special class of Markov processes with many applications in Physics, Chemistry and Biology \cite{vanKampen92}. The application of these type of stochastic processes in population biology started long time ago. The seminal paper by Kendall \cite{Kendall48} can be considered to be the starting point. In Kendall's work, the main mathematical concepts discussed in this section are already used: the master equation (section \ref{master_equation}) ---which did not receive such a name until later \cite{vanKampen92}, the equation for the probability generating function (section \ref{master_equation}), and the search for stationary states (section \ref{stationary_distribution}). A review of early achievements in the application of this formalism to different problems in ecology and epidemiology can be found in \cite{Barlett60}.
+\smallskip
+
+In the last decades, this formalism has been used to build a strong theoretical foundation for population and community ecology. On the one hand, it represents an extension of classical deterministic approaches. On the other hand, it emphasizes the natural continuous flow of time and the essential discreteness of individuals and ecological events, such as birth, death, and immigration events. In addition, unlike complicated individual-based stochastic simulations, models based on this kind of stochastic processes are usually amenable to mathematical analysis, which provides complementary insights to those obtained by using the deterministic approach. Here we also insist on the importance of both deterministic and stochastic approach in modeling biological populations \cite{Nisbet82,Renshaw91}. In this section, we present a general derivation of the master equation based on the idea of statistical ensemble, as well as the general expression for the stationary distribution in terms of elemental transition rates. We also introduce the basic idea underlying the Gillespie algorithm, which allows the generation of exact replicates of the stochastic temporal dynamics of a given system. In addition, we introduce the quasi-stationary state to provide a simple, approximated method to calculate mean times to extinction in systems lacking true stationary behavior. Finally, we present a natural, formal link between deterministic and stochastic models by means of the expansion of the master equation (see subsection \ref{expansion}). Throughout this section, we present the theoretical material through simple examples.
+
+\subsection{The idea of statistical ensemble}
+\label{master_equation}
+Biologists are used to design experiments in which several replicates of the experimental system under study are set up. Although replicates are assumed to be identical or, at least, interchangeable, each of them may yield slightly different results. Results of a replicated experiment are always given in terms of the distribution of certain measured variables across replicates. Physicists instead are used to mental experiments. In particular, suppose our system is a biological population represented by $n_0$ individuals at at a given time $t_0$, physicists assume a large number of identical and independent replicates of this system, all of them containing exactly $n_0$ individuals at at a given time $t_0$. This set of ideal replicates is called {\em statistical ensemble}\footnote{This theoretical idea is a powerful tool in statistical mechanics}. If there are dynamic processes affecting the number of individuals in the population, after some time, each replica will have evolved independently and show different population numbers. Here, we build a set of equations to study the temporal evolution of the whole ensemble \citep{Allen87}. 
+\smallskip
+
+One-dimensional, one-step processes apply to systems whose state at any given time $t$ is totally determined by an integer $n$. They are fully defined by the probabilities of increasing or decreasing this number in a small time interval, $dt$:
+\begin{eqnarray}
+\Pb\{ n \longrightarrow n+1 \} & = & g_n dt \nonumber\\
+\Pb\{ n \longrightarrow n-1 \} & = & r_n dt
+\label{eq:pb}
+\end{eqnarray}
+where $g_n$ and $r_n$ are called transition rates. 
+\smallskip
+
+We note by $\Omega$ the total number of replicas in our ensemble. At the initial time ($t=0$, for convenience), all our replicas are identical. They are copies of our biological population and all of them are represented by $n_0$ individuals. If we note by $\Omega(n,t)$ the number of replicas with $n$ individuals at time $t$, then the initial condition can be written as $\Omega(n_0,0)=\Omega$. Our goal is to trace the temporal evolution of this number, $\Omega(n,t)$, for $n=0, \dots, \infty$. If we wait for a small time interval, the number of systems in each category changes according to probabilities given above (see Eqs \ref{eq:pb}):
+\begin{eqnarray}
+\Omega(n,t+dt) \,\, = \,\, \Omega(n,t)  & + & g_{n-1} dt \Omega(n-1,t) \,\, + \,\, r_{n+1} dt \Omega(n+1,t) \nonumber \\
+                              & - & g_n dt \Omega(n,t) \,\, - \,\,r_n dt \Omega(n,t)                        \nonumber \\
+\textup{for} \,\, n > 0,      &   &                                                                         \nonumber \\        
+\textup{and for} \,\, n = 0,  &   &                                                                         \nonumber \\
+\Omega(0,t+dt) \,\, = \,\, \Omega(0,t)  & + & r_1 dt \Omega(1,t) \,\, - \,\, g_0 dt \Omega(0,t)             
+\end{eqnarray}
+The rate of change in the number of systems in each category can be then written as:
+\begin{eqnarray}
+\frac{\Omega(n,t+dt) - \Omega(n,t)}{dt} & = & g_{n-1} \Omega(n-1,t) \,\, + \,\, r_{n+1} \Omega(n+1,t) \nonumber \\
+                                        & - & g_n \Omega(n,t) \,\, - \,\, r_n  \Omega(n,t)            \nonumber \\
+\textup{for} \,\, n > 0,                &   &                                                         \nonumber \\        
+\textup{and for} \,\, n = 0,            &   &                                                         \nonumber \\
+\frac{\Omega(0,t+dt) - \Omega(0,t)}{dt} & = & r_1  \Omega(1,t) \,\, - \,\, g_0 \Omega(0,t)             
+\end{eqnarray}
+In addition, as $dt \rightarrow 0$, the left hand sides of the last equations above become derivatives with respect to time, and, as we argued for the particular case of the Poisson counting process in section 1 on % \ref{subsection:Poisson_Process}, 
+counting Poisson processes, we can use that the probability of having the system in the $n$ category at time $t$ is the fraction of systems in the $n$ category divided by the total number of systems in the ensemble when this number is very large:
+\begin{equation}
+P(n, t) = \lim_{\Omega \rightarrow \infty} \frac{\Omega(n,t)}{\Omega} 
+\end{equation}
+which allows to express the temporal evolution of the probabilities of having the system at each $n$ category as a system of ODEs:
+\begin{eqnarray}
+\frac{dP(n,t)}{dt}            & = & g_{n-1} P(n-1,t) \,\, + \,\, r_{n+1} P(n+1,t) \nonumber \\
+                              & - & g_n P(n,t) \,\, - \,\, r_n  P(n,t)            \nonumber \\
+\textup{for} \,\, n > 0,      &   &                                               \nonumber \\        
+\textup{and for} \,\, n = 0,  &   &                                               \nonumber \\
+\frac{dP(0,t)}{dt}            & = & r_1 P(1,t) \,\, - \,\, g_0 P(0,t)             
+\label{me_1}
+\end{eqnarray}
+This set of ODEs is commonly named {\em the master equation}.
+
+\subsection{An equation for the probability generating function}
+Solving the master equation for $P(n,t)$ directly is difficult if not impossible in general. This can only be achieved in certain simple cases (see section 1 on the counting Poisson process). More generally, one-step process 
+% \ref{subsection:Poisson_Process}
+whose rates $g_n$ and $r_n$ are linear in $n$ can be solved through the probability generating function, $G(x,t)$, associated to the distribution $P(n,t)$ \cite{Barlett60}:
+\begin{equation}
+G(x,t) = \sum_{n=0}^{\infty} P(n,t) x^n
+\end{equation}
+First we need an equation for $G(x,t)$. This can be obtained from the master equation, Eq. (\ref{me_1}), by multiplying each ODE in the set by its corresponding factor $x^n$ and summing the resulting equations. As an example, let us consider the Yule process, which is defined by the following probability rates:
+\begin{align*}
+	g_n & = \beta n\\
+    r_n & = 0
+\end{align*}
+This process could represent, for instance, a bacterial population in exponential growth where cells constantly divide at rate $\beta$, and have a negligible probability of dying. The Eq. (\ref{me_1}) can be written in this case with no terms in $r_n$:    
+\begin{eqnarray}
+\frac{dP(n,t)}{dt}            & = & \beta (n-1) P(n-1,t) - \beta n P(n,t)         \nonumber \\
+\textup{for} \,\, n > 0,      &   &                                               \label{eq:Yule}
+\end{eqnarray}
+Notice that the equation in $n=0$ is trivial. If we take as the initial condition a population with only once cell, $P(0,t) = 0$ for any later time $t$ since there are no deaths. This initial condition can be expressed in terms of the probability distribution, $P(1,0)=1$ and $P(n,0)=0$ for any $n \not = 1$, as well as in terms of the corresponding probability generating function, $G(x,0) = P(1,0) x = x$. Additionally, normalization requires $G(1,t) = 1$ for any time $t$. Therefore, by summing ODEs in the system given by Eqs. (\ref{eq:Yule}) after multiplying each of them by the corresponding factor $x^n$, we obtain:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial t} = \sum_{n=1} \beta (n-1) x^n P(n-1,t) - \sum_{n=1} \beta n x^n P(n,t)
+\end{equation}
+Notice that the last equation can be written as:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial t} = \beta x^2 \sum_{m=1} m x^{(m-1)} P(m,t) - \beta x \sum_{n=1}n x^{(n-1)} P(n,t)
+\end{equation}
+Since we have that:
+\begin{equation}
+\frac{\partial G(x,t)}{\partial x} = \sum_{n=1} n x^{(n-1)} P(n,t)
+\end{equation}
+we arrive to a quite simple equation for the probability generating function:
+\begin{equation}
+\label{eq:GenYule}
+\frac{\partial G(x,t)}{\partial t} = \beta x (x-1) \frac{\partial G(x,t)}{\partial x}
+\end{equation}
+This partial differential equation can be solved (see Appendix A) to give rise to the following solution:
+\begin{equation}
+G(x,t) = \frac{x \, e^{-\beta t}}{1 - (1 -e^{-\beta t})x}
+\end{equation}
+Finally, we remark that this is the probability generating function for a geometric distribution of parameter $p=e^{-\beta t}$, being $q=1-e^{-\beta t}$, this is, we conclude that, if the initial population size is just 1, the probability of finding $n$ descendant individuals after a time $t$ is given by:
+\begin{equation}
+P(n,t) = p q^{n-1} = e^{-\beta t} \, (1 - e^{-\beta t})^{n-1}
+\end{equation}
+
+\subsection{The stationary distribution}
+\label{stationary_distribution}
+We are interested in finding a stationary state for a general one-step stochastic process governed by Eq. (\ref{me_1}) given a particular definition of the transition rates, $g_n$ and $r_n$. The stationary state is defined as the state in which $P(n, t)$ is time independent. Let us noted as $P_s(n)$. If we set $dP(n,t)/dt=0$ in Eq. (\ref{me_1}), we obtain the following set of equations:
+\begin{eqnarray}
+\label{seq_n}
+0 & = & r_{n+1} P_s(n+1) - g_n P_s(n) - (r_n P_s(n) - g_{n-1} P_s(n-1))\,, \\
+  &\vdots& \nonumber\\
+\label{seq_0}
+0 & = & r_{1} P_s(1) - g_0 P_s(0)\,.
+\end{eqnarray}
+Eq (\ref{seq_n}) implies that $r_n P_s(n) - g_{n-1} P_s(n-1) = J$ for any $n \ge 1$, where $J$ is a constant. However, by looking at the equation for $n=0$, we observe that $r_{1} P_s(1) - g_0 P_s(0) = 0$, which can be used in the equation for $n=1$ to show that $J = 0$, and, therefore 
+\begin{equation}
+P_s(n) = \frac{g_{n-1}}{r_n} P_s(n-1)\ ; \ n = 1,...,N\, . 
+\label{balance}
+\end{equation}
+The last recurrent relation can be extended to write the general stationary solution for a one-step stochastic process as: 
+\begin{equation}
+P_s(n) = \frac{g_{n-1}\, g_{n-2} ...\, g_0}{r_n\, r_{n-1} ...\, r_1} 
+P_s(0)\ ; \ n = 1,...,N\, .
+\label{P_stationary}
+\end{equation}
+where the constant $P_s(0)$ can be determined from the normalization condition
+\begin{equation}
+\sum_{n=0}^N P_s(n) = P_s(0) + \sum_{n>0} P_s(n) = 1\, :
+\label{Norma}
+\end{equation}
+\begin{equation}
+(P_s(0))^{-1} = 1 + \sum_{n=1}^{N} \frac{g_{n-1}\, g_{n-2} ...\, g_0}{r_n\, 
+r_{n-1} ...\, r_1}\, .  
+\label{inversionPs(0)}
+\end{equation}
+
+\subsection{The quasi-stationary distribution}
+\label{quasi-stationary}
+In many birth-death processes ---those characterized by $g_0=0$--- there is no stationary probability distribution. Eventually the systems goes to extinction and no further dynamics is observed. In these cases, we can define a probability distribution ---conditioned to no extinction--- which very often reaches stationary values. This is called the quasi-stationary distribution. It is mean to describe the probability of the system having $n$ individuals as long as the population has not gone to extinction yet. We can always defined a conditional probability distribution, $P_c(n,t)$, as:
+\begin{equation}
+  \label{QE_def}
+  P_c(n,t) = \frac{P(n,t)}{1-P(0,t)}
+\end{equation}
+Consistently, the quasi-stationary distribution arises from considering the limit of the last equation as time tends to infinity. A rapid look at Eq. (\ref{QE_def}) shows that such a limit is in principle undetermined. So, it must be calculated carefully. However, it is easy to calculate the temporal evolution of this conditional probability:
+\begin{equation}
+  \frac{dP_c(n,t)}{dt} =  \frac{1}{(1 - P(0,t)}\left(\frac{dP(n,t)}{dt} + P_c(n,t)\frac{dP(0,t)}{dt}\right)
+\end{equation}
+The last equation, by using the actual master equation (Eq. \ref{me_1}), can be written in the same way, as a set of ODEs from $n=1, \dots, $ with a correction term, as follows. For $n>1$,
+\begin{equation}
+  \label{QE_1}
+  \frac{dP_c(n,t)}{dt} = g_{n-1} P_c(n-1,t) + r_{n+1} P_c(n+1,t) - P_c(n,t)\left(r_n + g_n - P_c(1,t)r_1\right)
+\end{equation}
+and, for $n=1$,
+\begin{equation}
+  \label{QE_2}
+  \frac{dP_c(1,t)}{dt} = P_c(2,t) r_2 - P_c(1,t)\left(r_1 + g_1\right) + P_c^2(1,t) r_1
+\end{equation}
+
+\subsubsection{An iterative algorithm}
+By equating Eqs. (\ref{QE_1})-(\ref{QE_2}) to zero we can investigate the existence of a quasi-stationary solution. We can approximate the quasi-stationary distribution iteratively by the following algorithm \cite{Nisbet82}:
+\begin{enumerate}
+\item Try a guess for $P^*_c(1)$.
+\item By making Eq. (\ref{QE_2}) equal to zero estimate $P^*_c(2)$:
+  \begin{equation}
+    P^*_c(2) = \frac{(r_1+g_1)P^*_c(1) - r_1 P^*_c(1) P^*_c(1)}{r_2}
+  \end{equation}
+\item By using Eqs. (\ref{QE_1}) equalized to zero, obtain an iterative estimation of the 
+rest of values for $n>2$ up to $P^*_c(n)$ being less that an accuracy parameter $\epsilon$:
+  \begin{equation}
+    P^*_c(n) = \frac{(r_{n-1}+g_{n-1})P^*_c(n-1) - g_{n-2} P^*_c(n-2) - r_1 P^*_c(1) P^*_c(n-1)}{r_n}
+  \end{equation}
+\item Normalize the resulting conditional distribution. By so doing, get a new estimation 
+of $P^*_c(1)$. If the result differs significantly from the previous guess of $P^*_c(1)$ 
+repeat the whole process iteratively.
+\end{enumerate}
+
+We notice that the recurrence relation (\ref{balance}) is almost a solution of the system. If we introduce this recurrence into (\ref{QE_1}), we obtain:
+\begin{equation}
+  \label{QE_3}
+  \frac{dP_c(n,t)}{dt} =  - P_c(1,t)r_1\,P_c(n,t) \approx 0
+\end{equation}
+which is almost zero provided that $P_c(1,t) \approx 0$. In essence, the shape of the quasi-stationary conditional distribution matches the non-stationary total probability distribution when $P(1,t)$ is almost zero, and the rhythm at which the total probability vanishes out is proportional to $r_1$ and $P_c(1,t)$. In the next section, we will apply this conditional probability distribution to estimate the mean time to extinction.
+
+\subsection{The mean time to extinction}
+\label{T_E_Approx}
+The mean time to extinction in systems where there is no stationary state ($g_0 = 0$), given an initial population of $n_0\not=0$, the mean time to extinction can be calculated exactly for a general birth-death stochastic process characterized by $r_n$ and $g_n$ probability transition rates \citep{Nisbet82}:
+\begin{equation}
+T_E(n_0) = \sum_{i=0}^\infty q_{i} + \sum_{j=1}^{n_0-1}S_{j}\sum_{i=j+1}^\infty q_i  
+\end{equation}
+where $q_{i}$ and $S_i$ are given by:
+\begin{equation}
+q_i = \frac{g_{i-1}\dots g_{1}}{r_i\dots r{1}}\,, 
+\end{equation}
+and
+\begin{equation}
+S_i = \frac{r_{i}\dots r_{1}}{g_{i}\dots g{1}}
+\end{equation}
+
+However, although exact, the last formal expression is quite cumbersome, and may not be easy to evaluate in practical cases. The introduction to the quasi-stationary distribution allows a simpler, but approximated approach to calculate an estimate for this time. It can be obtained from the conditional probability defined in the last section. This approximation highlights the leading contribution to the average extinction time. As we will show, this time can be approximated by the inverse of $r_1\,P_c^{*}(1)$, where $P_c^{*}(1)$ is the quasi-stationary value of the conditional probability $P_c(n,t)$ for $n=1$, and $r_1$ is the death rate of the last individual in the system. 
+
+Since the $P(0,t)$ is the probability of having no population at time $t$, it can be regarded as the probability distribution function for the random variable ``time to extinction'', $T_E$. In other words, the probability of total extinction having occurred at certain time, $T_E < t$, is exactly given by the function $P(0,t)$. Therefore, 
+\begin{equation}
+Pr\{T_E < t\} = P(0,t).
+\end{equation}  
+We can then calculate the expected extinction time as:
+\begin{equation}
+\langle T_E \rangle = \int_0^{\infty}t\,\frac{dP(0,t)}{dt}\,dt
+\end{equation}
+By integrating by parts the last equation can be written as:
+\begin{equation}
+\langle T_E \rangle = \int_0^{\infty}\left(1-P(0,t)\right)\,dt
+\end{equation}
+The integrand of the last equation can be approximated by using the quasi-stationary probability. Notice that, by using the definition of the conditional  probability $P_c(n,t)$, we have:
+\begin{equation}
+\frac{dP(0,t)}{dt}=r_1\,P(1,t)=r_1\,P_c(1,t)\,(1-P(0,t))\approx r_1\,P_c^{*}(1)\,(1-P(0,t))
+\end{equation}
+The last differential equation, although approximated, can be solved, which gives the following approximate expression:
+\begin{equation}
+1-P(0,t) \approx A\exp(-r_1P_c^{*}(1)\,t)
+\end{equation}  
+The initial condition tell us that $A=1$. So, $P(0,t) \approx 1 -\exp(-r_1\,P_c^{*}(1)\,t)$, which gives the approximated expression for mean extinction time as we promise to show: 
+\begin{equation}
+\langle T_E \rangle \approx \int_0^{\infty}\exp(-r_1\,P_c^{*}(1)\,t)\,dt=\frac{1}{r_1\,P_c^{*}(1)}
+\end{equation}
+
+\subsection{The expansion of the master equation}
+\label{expansion}
+Inherent stochasticity ---as opposed to externally-induced fluctuations--- is fully described by the master equation. In one-dimensional, one-step processes, this equation describes a time-dependent, integer-valued stochastic variable, $n$, through the temporal evolution of its associated probability distribution, $P(n,t)$. We know that, in general, deterministic descriptions are more accurate the larger a system is. This means that the relative importance of the fluctuations around the deterministic average decreases as the system becomes larger and larger. This systematic expansion furnishes a general approximation to the master equation that highlight this intuitive idea. The method gives rise to an equation for the average of the variable, $n$, ---a.k.a {\em macroscopic law} \cite{vanKampen92}---, and an equation for the fluctuations around this average, which becomes more and more accurate as more and more terms, weighted by decreasing, negative powers of a {\em size} parameter, are considered. This {\em size} parameter will depend on the system under study.  
+\smallskip
+
+We will present this method through a biological example. Most marine invertebrate species have a planktonic larva. This stage can be seen as a dispersal strategy. However, adult life is bentonic. After some time in the plankton, larvae settle down and a juvenile life stage starts. During this juvenile stage individuals mature, find mates, and reproduce, sending again the offspring back to the plankton. We will consider the dynamics of a juvenile population of a given marine species in an area of size $\Omega$. Juveniles enter the population as a constant influx from the plankton. They keep this juvenile state until finding a mate. So, pairwise encounters determine the rate at which juveniles disappear from the area. Here we are not considering additional juvenile mortality. This dynamics can be summarized by the following transition rates. The probability of a new juvenile entering the area will be proportional to that area $\Omega$. Apart from an intrinsic probability controlling the mating process, the probability of disappearance of a juvenile will be proportional to the probability of a pairwise encounter, and this probability will be proportional to the inverse of the area, $\Omega$. 
+Therefore, we have:
+\begin{eqnarray}
+\label{g_n_exp}
+g_n &=& k_{1}\,\Omega\\
+r_n &=& k_{2}\,\frac{n(n-1)}{\Omega},
+\label{r_n_exp}
+\end{eqnarray}
+where $k_{1}$ is the influx rate per unit area and $k_{2}$ controls the intrinsic mating rate once a pair-wise encounter has taken place. As usual, these rates enable the writing of an equation for the temporal evolution of the number of juveniles in the area $\Omega$, $P(n,t)$, which is, as we know, the master equation, Eq. (\ref{me_1}). In this context, it will be very useful to introduce two operators that simplify this equation:
+\begin{eqnarray}
+\label{E_1}
+\textup{E}f(n)      &=& f(n+1)\\
+\textup{E}^{-1}f(n) &=& f(n-1)
+\label{E_2}
+\end{eqnarray}
+Notice that the above definitions transform the Eq. (\ref{me_1}) into:
+\begin{equation}
+\label{me_E}
+\frac{dP(n,t)}{dt}=(\textup{E}-1)r_n\,P(n,t) + (\textup{E}^{-1}-1)g_n\,P(n,t)
+\end{equation}  
+By using Eqs. (\ref{g_n_exp})-(\ref{r_n_exp}), and also a shorter notation for 
+$P(n,t)\equiv\,p_n$, we have:
+\begin{equation}
+\label{me_E}
+\frac{dp_n}{dt}=\frac{k_2}{\Omega}(\textup{E}-1)n(n-1)\,p_n + k_{1}\Omega(\textup{E}^{-1}-1)\,p_n\,.
+\end{equation}  
+which is valid for $n>0$. For $n=0$ only the arrival of new juveniles is possible:
+\begin{equation}
+\frac{dp_0}{dt}= -k_{1}\Omega\,p_0.
+\end{equation}
+\smallskip
+
+The expansion of the master equation is based on the following assumption. The number of juveniles at some time $t$ can be approximated by:
+\begin{equation}
+\label{central}
+n = \Phi(t)\,\Omega + \Omega^{\frac{1}{2}}\,\xi
+\end{equation}
+This assumes that the temporal evolution of the variable $n$ can be described by a combination of the a new variable $\Phi(t)$ which entails the temporal evolution of the mean value of $n$, and a new variable $\xi$, which controls for the importance of fluctuations around this mean value. Notice that the relative importance of fluctuations around mean densities scale with the size of the area $\Omega^{-1/2}$, according to the general intuition that fluctuations are relatively more important in small systems, i.e., at low numbers. More precisely, notice that:
+\begin{enumerate}
+\item The density of individuals follows the evolution of the mean density $\Phi(t)$ as the size of the system is large:
+\begin{equation}
+\frac{n}{\Omega}=\Phi(t)+\xi\,\Omega^{-\frac{1}{2}}\, \Rightarrow\, \lim_{\Omega \to \infty}\frac{n}{\Omega}=\Phi(t)\,.
+\end{equation}    
+\item The expected value for the number of juveniles should be written as $\Phi(t)\,\Omega$, which requires the expected value for the stochastic variable $\xi$ to be zero:
+\begin{equation}
+<n> = \Phi(t)\,\Omega \Rightarrow <\xi>=0\,.
+\end{equation} 
+\item The variance in the number of juveniles increases with $\Omega$, but the relative importance of fluctuations in relation to the size of the system will vanishes \vicente{typo} as $\Omega$ tends to infinity:
+\begin{eqnarray}
+\textup{Var}(n)&=&<(n-<n>)^2>=<(\xi\,\Omega^{\frac{1}{2}})^2> = \Omega\,<\xi^2>=\Omega\,\textup{Var}(\xi)\,\nonumber\\
+&\Rightarrow& \textup{Var}(\xi)=\frac{\textup{Var}(n)}{\Omega}\,\to\,0\,\,\textup{as}\,\,\Omega\,\to\,\infty\,. 
+\end{eqnarray}
+\end{enumerate}
+ 
+Our interest now is to translate the master equation for $P(n,t)$ (Eq. \ref{me_E}) into an equivalent equation for a probability distribution of the new stochastic variable, $\xi$, through the suggested change of variables ---see Eq. (\ref{central}). The goal is obtaining, first, as the leading contribution of the expansion, an equation for the temporal evolution of mean density values, and, second, an equation for the temporal evolution of fluctuations, which include further terms in decreasing, negative powers of the {\em size} parameter, $\Omega$. In oder to make this transformation, first, we note that:
+\begin{enumerate}
+\item The probability distribution $P(n,t)$ can be written in terms of $\xi$ by introducing the central expression for $n$ (Eq. \ref{central}):
+\begin{equation}
+\label{eq:Pi_Def}
+p_n \equiv P(n,t) = P(\Phi(t)\,\Omega + \Omega^{\frac{1}{2}}\,\xi,t)\,\equiv\,\Pi(\xi,t)
+\end{equation}
+Here, we will take Eq. (\ref{eq:Pi_Def}) as the definition of the function $\Pi(\xi,t)$\footnote{However, $P(n,t)$ and $\Pi(\xi,t)$ are two probability distributions whose associated stochastic variables are related to each other by a linear change ($n~=~\Phi\Omega+\Omega^{1/2}\xi$). This will introduce a multiplicative factor in the above given definition: $\Pi(\xi,t)~=~\Omega^{1/2}\,P(\Phi\Omega+\Omega^{1/2}\xi,\,t)$, but this will not alter alter the rest of this derivation in any meaningful way. Notice that the set of ODEs in Eq. (\ref{me_E}) determine the probabilities except a multiplicative constant.}.     
+\item The time derivatives arising in the master equation (\ref{me_E}) are performed by keeping $n$ constant for each equation of the set. We must bear this in mind, when we express these time derivatives in terms of the new variable $\xi$ and the new probability distribution $\Pi(\xi,t)$. More precisely, since $n=\Phi(t)\,\Omega + \Omega^{\frac{1}{2}}\,\xi=\textup{Constant}$, if we derive this expression with respect to time, we will have :
+\begin{eqnarray}
+\label{time_derivative}
+\Omega\,\frac{d\Phi}{dt}+\Omega^{\frac{1}{2}}\,\frac{d\xi}{dt} &=& 0\nonumber\\
+ &\Rightarrow&\,\frac{d\xi}{dt}=-\Omega^{\frac{1}{2}}\,\frac{d\Phi}{dt}\,.
+\end{eqnarray}
+\item The new probability distribution $\Pi(\xi,t)$ has an explicit and an implicit time dependence through the variable $\xi$. The last consideration allows to calculate these total time derivative as:
+\begin{equation}
+\label{time_derivative_2}
+\frac{d\Pi(\xi,t)}{dt}=\frac{\partial\Pi}{\partial\,t} + \frac{\partial\Pi}{\partial\,\xi}\frac{d\xi}{dt} 
+\end{equation}
+which can be written, by using Eq. (\ref{time_derivative}), as:
+\begin{equation}
+\frac{d\Pi(\xi,t)}{dt}=\frac{\partial\Pi}{\partial\,t} - \Omega^{\frac{1}{2}}\,\frac{d\Phi}{dt} \frac{\partial\Pi}{\partial\,\xi}	
+\label{eq:dPi}
+\end{equation}
+\end{enumerate}
+\smallskip
+
+Since $\Pi(\xi,t)$ has been defined as $P(\Phi(t)\,\Omega + \Omega^{\frac{1}{2}}\,\xi,t)$, Eq. (\ref{eq:dPi}) completes the transformation of the left hand side of the master equation ---see Eq. (\ref{me_E}). However, we still need to convert the operators $\textup{E}$ and $\textup{E}^{-1}$ and the transition rates into functions of $\xi$. By using Eq. (\ref{central}), transition rates given by Eqs. (\ref{g_n_exp})-(\ref{r_n_exp}) can be readily written in terms of $\xi$. After some algebra, we obtain:\vicente{The first term of Eq 50 should have Phi squared}
+\begin{eqnarray}
+\label{g_n_Exp}
+g_n & = & k_{1}\,\Omega\\
+r_n & = & k_{2}\,\Omega\,\Phi+2k_{2}\,\xi\,\Phi\Omega^{\frac{1}{2}}-k_{2}(\Phi-\xi^2) - k_{2}\,\xi\,\Omega^{-\frac{1}{2}}\,. 
+\label{r_n_Exp}
+\end{eqnarray}
+Now, we should investigate how the operators $\textup{E}$ and $\textup{E}^{-1}$, defined by Eqs. (\ref{E_1})-(\ref{E_2}), change a function that depends on $\xi$ rather than on $n$. This is quite easy if we note that, by using Eq. (\ref{central}):
+\begin{equation}
+n+1 = \Phi\,\Omega + \Omega^{\frac{1}{2}}\,(\xi+\Omega^{-\frac{1}{2}})
+\end{equation}
+Therefore, the action of the operators $\textup{E}$ and $\textup{E}^{-1}$ on functions depending on $\xi$ will be:
+\begin{eqnarray}
+\textup{E}\,f(n) &=& \textup{E}\,F(\xi) = F(\xi + \Omega^{-\frac{1}{2}})\\
+\textup{E}^{-1}\,f(n) &=& \textup{E}^{-1}\,F(\xi) = F(\xi - \Omega^{-\frac{1}{2}})
+\end{eqnarray} 
+The key point of the systematic expansion of the master equation is to write these operators as a Taylor expansion around $\xi$, where the accuracy of the expansion improves as the size of the system, $\Omega$, tends to infinity. Alternatively, as the size of the systems shrinks, in order to keep system description accurate, we will need more and more terms in the expansion. Notice that the Taylor expansion is left in terms of negative powers of $\Omega$:
+\begin{eqnarray}
+\label{E_3}
+\textup{E}\,f(n) & = &\textup{E}\,F(\xi) = F(\xi)+\Omega^{-\frac{1}{2}}\frac{dF}{d\xi}+\frac{1}{2}\Omega^{-1}\frac{d^2F}{d\xi^2}+\ldots\\
+\textup{E}^{-1}\,f(n) & = &\textup{E}^{-1}\,F(\xi) = F(\xi)-\Omega^{-\frac{1}{2}}\frac{dF}{d\xi}+\frac{1}{2}\Omega^{-1}\frac{d^2F}{d\xi^2}-\ldots
+\label{E_4}
+\end{eqnarray} 
+Therefore, in general, we can write the operators arising in the master equation, Eq. (\ref{me_E}), as true operators in terms of negative powers of $\Omega$:
+\begin{eqnarray}
+\label{E_5}
+\textup{E}\,-1      & = &  \Omega^{-\frac{1}{2}}\frac{\partial}{\partial\xi}+\frac{1}{2}\Omega^{-1}\frac{\partial^2}{\partial\xi^2}+\ldots\\
+\textup{E}^{-1}\,-1 & = & -\Omega^{-\frac{1}{2}}\frac{\partial}{\partial\xi}+\frac{1}{2}\Omega^{-1}\frac{\partial^2}{\partial\xi^2}-\ldots\,,
+\label{E_6}
+\end{eqnarray}
+where we have used partial derivatives to emphasize the fact that these operators act on functions in general dependent on both $\xi$ and time. 
+
+Finally, we have all the necessary ingredients to fully transform Eq. (\ref{me_E}) in terms of the new variable $\xi$ and its associated probability distribution $\Pi(\xi,t)$. First, to keep generality, let us only make use of Eqs. (\ref{eq:dPi}), and the expressions for the operators (\ref{E_5})-(\ref{E_6}), and introduce them into the master equation, Eq. (\ref{me_E}). This is what we obtain:\vicente{And here we are missing the 1/2 in the second derivatives}
+\begin{eqnarray}
+\frac{\partial\Pi}{\partial\,t}-\Omega^{\frac{1}{2}}\,\frac{d\Phi}{dt}\frac{\partial\Pi}{\partial\,\xi} & = & \left\{\Omega^{-\frac{1}{2}}\partial_{\xi}+\Omega^{-1}\partial_{\xi}^2+\dots\right\}(r_n\,\Pi(\xi,\,t))\nonumber\\
+         &   & \left\{-\Omega^{-\frac{1}{2}}\partial_{\xi}+\Omega^{-1}\partial_{\xi}^2-\dots\right\}(g_n\,\Pi(\xi,\,t))\,,
+\end{eqnarray}
+which can be written as:
+\begin{eqnarray}
+\label{Expan}
+\frac{\partial\Pi}{\partial\,t}-\Omega^{\frac{1}{2}}\,\frac{d\Phi}{dt}\frac{\partial\Pi}{\partial\,\xi} & = &\Omega^{-\frac{1}{2}}\partial_{\xi}\left[(r_n-g_n)\,\Pi\right]\nonumber\\
+         &   &\Omega^{-1}\partial_{\xi}^2\left[(r_n+g_n)\,\Pi\right]\nonumber\\
+         &   &\dots\,,
+\end{eqnarray}
+This is still valid for any one-step process, defined by rates $g_n$ and $r_n$. Now, by introducing the transition rates (\ref{g_n_Exp})-(\ref{g_n_Exp}) in Eq. (\ref{Expan}), we can now group terms in powers of $\Omega$. After some algebra, this process give rise to two equations:
+\begin{enumerate}
+\item Grouping terms in powers of $\Omega^{1/2}$, we obtain the equation for the temporal evolution of the density of juveniles, $\Phi(t)$, the macroscopic law:
+\begin{equation}
+\label{macroscopic_law}
+\frac{d\Phi}{dt} = k_{1} - k_{2}\,\Phi^2\,.
+\end{equation}
+This deterministic description gives the evolution of the average density of individuals, $\Phi=n/\Omega$ as a result of a constant influx of new juveniles and a density-dependent disappearance consequence of pair-wise encounters. 
+\item Grouping terms in powers $\Omega^0$, a second equation emerges, which governs the fluctuations around the expected value of $n$. It can be grouped, in turn, in terms affected by decreasing, negative powers of $\Omega$. This further terms can be regarded as corrections to the leading order in $\Omega^0$. This equation is:
+\begin{eqnarray}
+\label{linear}
+\frac{\partial\Pi}{\partial\,t}&=&-\frac{d\alpha_1}{d\Phi}\frac{\partial(\xi\Pi)}{\partial\,\xi}+\frac{1}{2}\alpha_2(\Phi)\frac{\partial^2\Pi}{\partial\,\xi^2}\\
+                               &+&\Omega^{-\frac{1}{2}}\left[\dots\,\,\dots\right]\nonumber\\
+                               &+&\Omega^{-\frac{3}{2}}\left[\dots\,\,\dots\right]\nonumber
+\end{eqnarray} 
+where
+\begin{eqnarray}
+\label{a_1}
+\alpha_1(\Phi) &\equiv& k_{1} - k_{2}\,\Phi^2 \\ 
+\alpha_2(\Phi) &\equiv& k_{1} + k_{2}\,\Phi^2
+\label{a_2}
+\end{eqnarray} 
+\end{enumerate}
+
+If we neglect orders further than $\Omega^{0}$, we obtain the so-called linear noise approximation \cite{vanKampen92}. Within this approximation, the macroscopic law and the equation for the fluctuations can be written in general terms as:
+\begin{eqnarray}
+\frac{d\Phi}{dt} &=& \alpha_1(\Phi)\\
+\frac{\partial\Pi}{\partial\,t}&=&-\frac{d\alpha_1}{d\Phi}\frac{\partial(\xi\Pi)}{\partial\,\xi}+\frac{1}{2}\alpha_2(\Phi)\frac{\partial^2\Pi}{\partial\,\xi^2}
+\label{linear_noise}
+\end{eqnarray}
+Notice that $\alpha_1(\Phi)$ (Eq. \ref{a_1}) and $\alpha_2(\Phi)$ (Eq. \ref{a_2}) only differ in one sign. This is completely general. The function $\alpha_1(\Phi)$ is equal to the right hand side of macroscopic law, while the function $\alpha_2(\Phi)$ contains also the loss and growth terms of the macroscopic law but all with positive signs. 
+
+Eq. (\ref{linear_noise}) is a linear Focker-Planck equation\footnote{The general form of a one-dimensional Fokker-Planck equation is: $$ \frac{\partial\Pi}{\partial\,t} = -\frac{\partial(A(\xi,t)\Pi)}{\partial\,\xi} + \frac{\partial^2 B(x,t)\Pi}{\partial\,\xi^2}$$. If $A(\xi,t)=\xi \, a(t)$ and $ B(\xi,t)=\xi \, b(t)$, we say that the Focker-Planck equation is linear. In our case, $A(\xi,t)=\alpha'_1(\Phi)\,\xi$, and $B(\xi,t) = 1/2\,\alpha_2(\Phi)$, which fulfills linearity. This is why this approximation is called a {\em linear noise approximation.}} whose coefficients depend on time through $\Phi$. The solution can be shown to be a Gaussian:
+\begin{equation}
+\label{Pi}
+\Pi(\xi,\,t) \approx \exp\left(-\frac{(\xi-<\xi>)^2}{2\,\textup{Var}(\xi)}\right)\,,
+\end{equation}
+where $<\xi>$ and $\textup{Var}(\xi)$ are the usual time-dependent Gaussian parameters. The temporal evolution of them can be calculated from Eq. (\ref{linear_noise}) by noticing the following equalities, where an integration by parts has been performed in those cases when was necessary:
+\begin{eqnarray}
+\int_{-\infty}^{+\infty}\xi\frac{\partial\Pi}{\partial\,t}d\xi &=& \partial_t<\xi>\\
+\int_{-\infty}^{+\infty}\xi^2\frac{\partial\Pi}{\partial\,t}d\xi &=& \partial_t<\xi^2>\\
+\int_{-\infty}^{+\infty}\xi\frac{\partial(\xi\Pi)}{\partial\,\xi}d\xi &=& -\,<\xi>\\
+\int_{-\infty}^{+\infty}\xi^2\frac{\partial(\xi\Pi)}{\partial\,\xi}d\xi &=& -2\,<\xi^2>\\
+\int_{-\infty}^{+\infty}\xi\frac{\partial^2(\Pi)}{\partial\,\xi^2}d\xi &=& 0\\
+\int_{-\infty}^{+\infty}\xi^2\frac{\partial^2(\Pi)}{\partial\,\xi^2}d\xi &=& 2\,.
+\end{eqnarray}
+Therefore, we finally end up with two equations:
+\begin{eqnarray}
+\label{xi}
+\partial_t<\xi>   & = & \frac{d\alpha_1}{d\Phi}\,<\xi>\\
+\partial_t<\xi^2> & = & 2\,\frac{d\alpha_1}{d\Phi}\,<\xi^2>+\alpha_2    
+\label{xi_2}
+\end{eqnarray}
+Eq. (\ref{xi}) gives the temporal evolution of expected value of $\xi$. As commented, since fluctuations are required to be centered around the mean value of $n$, consistency also requires that $<\xi>=0$. Furthermore, if our initial condition did not fulfill this requirement, the temporal evolution of $<\xi>$ would tend to make this initially non-centered fluctuation equal to zero, due to Eq. (\ref{xi}). However, if we take $<\xi>_0=0$, then $<\xi>_t=0$ for any further $t$. As as consequence, we will have that $\textup{Var}(\xi)=<\xi^2>$, with Eq. (\ref{xi_2}) governing its temporal evolution. This must be solved together with the macroscopic law to have a complete description of the temporal evolution of the initial probability distribution, $P(n,t)$, within the linear noise approximation. By making use of Eq. (\ref{Pi}) and the change of variable relating $n$ to $\xi$, given by Eq. (\ref{central}), this distribution can be written as:
+\begin{equation}
+  P(n,t) = \frac{1}{\sqrt{2\pi\,\Omega\,\textup{Var}(\xi)}}\exp\left(-\frac{(n-\Omega\Phi(t))^2}{2\,\Omega\,\textup{Var}(\xi)}\right)
+\end{equation} 
+where $\Phi(t)$ and $\textup{Var}(\xi)$ are time-dependent functions which give how the Gaussian moves as a whole while its variance changes according to Eq. (\ref{xi_2}).
+
+

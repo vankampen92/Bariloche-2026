@@ -1,0 +1,435 @@
+% =====================================================================
+% Extinction dynamics: quasi-stationarity and first-passage times
+% Insertable section for the Advanced Course in Continuous-Time
+% Stochastic Processes. Requires amsmath and amssymb.
+% =====================================================================
+\section{Extinction dynamics: quasi-stationary distributions and first-passage times}
+\label{sec:extinction-qsd-mfpt}
+
+In a birth--death process, we can often calculate a stationary probability
+ distribution by balancing the flows of probability between states. Yet this
+approach raises a fundamental difficulty when a population cannot recover after
+extinction. If immigration is absent, the empty state may be \emph{absorbing}:
+once the last individual dies, the population remains extinct forever. What
+can a stationary distribution tell us about such a population? And how long
+will it take to become extinct?
+
+We develop two complementary tools. The \emph{quasi-stationary distribution}
+(QSD) describes the abundance of a population \emph{conditional on its still
+being present}. The \emph{backward master equation} calculates the mean time
+to reach a specified state, such as extinction, starting from a given initial
+population size. Both descriptions originate from the same birth and death
+transition rates.
+
+\subsection{Absorbing states, survival, and extinction}
+\label{subsec:absorbing-extinction}
+
+Consider a continuous-time birth--death process $N(t)$ with state space
+$n=0,1,2,\ldots$ and elementary transitions
+\begin{equation}
+ n\longrightarrow n+1\quad\text{at rate }g_n,\qquad
+ n\longrightarrow n-1\quad\text{at rate }r_n.
+ \label{eq:ext-transition-rates}
+\end{equation}
+The forward master equation for $n\geq 1$ is
+\begin{equation}
+ \frac{dP(n,t)}{dt}=
+ g_{n-1}P(n-1,t)+r_{n+1}P(n+1,t)
+ -(g_n+r_n)P(n,t),
+ \label{eq:ext-forward}
+\end{equation}
+with the boundary equation
+\begin{equation}
+ \frac{dP(0,t)}{dt}=r_1P(1,t)-g_0P(0,t).
+ \label{eq:ext-boundary}
+\end{equation}
+If $g_0=0$, the state $0$ is absorbing. More generally, immigration at
+positive population sizes is compatible with $g_0=0$; what matters for
+absorption is that no event can leave state $0$. In an absorbing process,
+$P(0,t)$ cannot decrease, and the point mass concentrated at $n=0$ is
+always a stationary distribution. We should therefore avoid saying that
+``there is no stationary distribution'': the relevant question is whether a
+\emph{nontrivial} stationary distribution on positive population sizes
+exists. Extinction is certain in many familiar finite-population models,
+but not for every infinite-state birth--death process; for example, a
+supercritical branching process can escape extinction with positive
+probability.
+
+Let $\tau_0$ be the first time at which the population reaches zero:
+\begin{equation}
+ \tau_0=\inf\{t\geq0:N(t)=0\}.
+ \label{eq:ext-hitting-def}
+\end{equation}
+Assume that the population starts in a positive state. Because zero is
+absorbing, the \emph{survival probability} is
+\begin{equation}
+ S(t)=\Pr\{\tau_0>t\}=\Pr\{N(t)>0\}=1-P(0,t).
+ \label{eq:ext-survival}
+\end{equation}
+From Eq.~\eqref{eq:ext-boundary}, for $g_0=0$ we obtain the exact relation
+\begin{equation}
+ \boxed{\frac{dS(t)}{dt}=-r_1P(1,t).}
+ \label{eq:ext-survival-flux}
+\end{equation}
+Extinction can occur only through the last death, the jump from one
+individual to none. This simple balance relation is the starting point
+for both approaches developed below.
+
+\subsection{Quasi-stationary distributions: abundance conditional on survival}
+\label{subsec:ext-qsd}
+
+Although $P(n,t)$ may ultimately concentrate at the absorbing state, the
+abundance distribution among populations that have \emph{not yet} become
+extinct may approach a stable shape. For $n\geq1$, define
+\begin{equation}
+ P_c(n,t)=\Pr\{N(t)=n\mid\tau_0>t\}
+          =\frac{P(n,t)}{S(t)}.
+ \label{eq:ext-conditional}
+\end{equation}
+The conditional probabilities satisfy $\sum_{n\geq1}P_c(n,t)=1$.
+A \emph{quasi-stationary distribution} $\pi=(\pi_1,\pi_2,\ldots)$
+is a normalized distribution over positive states that remains unchanged
+when conditioned on survival. In particular, if the conditional distribution
+converges as $t\to\infty$, its limit is a QSD:
+\begin{equation}
+ \pi_n=\lim_{t\to\infty}P_c(n,t),\qquad
+ \sum_{n\geq1}\pi_n=1.
+ \label{eq:ext-qsd-def}
+\end{equation}
+Such a limit need not exist in every process, and a QSD need not be unique.
+
+We can derive an equation for the conditional probabilities without any new
+assumptions. Differentiating Eq.~\eqref{eq:ext-conditional} gives
+\begin{equation}
+ \frac{dP_c(n,t)}{dt}
+ =\frac{1}{S(t)}\frac{dP(n,t)}{dt}
+  -\frac{P(n,t)}{S(t)^2}\frac{dS(t)}{dt}.
+ \label{eq:ext-quotient}
+\end{equation}
+Using $dS/dt=-r_1P(1,t)=-r_1 S(t)P_c(1,t)$ yields
+\begin{equation}
+ \frac{dP_c(n,t)}{dt}
+ =\frac{1}{S(t)}\frac{dP(n,t)}{dt}
+  +r_1P_c(1,t)P_c(n,t).
+ \label{eq:ext-conditional-general}
+\end{equation}
+Notice the \emph{positive} sign of the additional term. It compensates
+for the probability continuously lost to extinction before the remaining
+probabilities are renormalized.
+
+For $n>1$, substitution of the forward master equation gives
+\begin{align}
+ \frac{dP_c(n,t)}{dt}={}&
+ g_{n-1}P_c(n-1,t)+r_{n+1}P_c(n+1,t)\notag\\
+ &-(g_n+r_n)P_c(n,t)+r_1P_c(1,t)P_c(n,t).
+ \label{eq:ext-qsd-n}
+\end{align}
+For $n=1$, the incoming term from $n=0$ is absent because $g_0=0$:
+\begin{equation}
+ \frac{dP_c(1,t)}{dt}
+ =r_2P_c(2,t)-(g_1+r_1)P_c(1,t)
+  +r_1[P_c(1,t)]^2.
+ \label{eq:ext-qsd-one}
+\end{equation}
+Setting the left-hand sides to zero gives the equations satisfied by a
+QSD, whenever one exists.
+
+\paragraph{An iterative construction.}
+For simple one-dimensional processes, the conditional equations suggest
+an iterative construction of the quasi-stationary distribution. Following
+the procedure introduced in the original notes, we proceed as follows:
+\begin{enumerate}
+\item Make an initial guess for $P_c^*(1)=q$.
+\item Set Eq.~\eqref{eq:ext-qsd-one} equal to zero and calculate $P_c^*(2)$:
+\begin{equation}
+ P_c^*(2)=\frac{(r_1+g_1)q-r_1q^2}{r_2}.
+ \label{eq:ext-qsd-pi2}
+\end{equation}
+\item Set Eq.~\eqref{eq:ext-qsd-n} equal to zero and successively calculate
+$P_c^*(n)$, for $n>2$, using
+\begin{equation}
+ P_c^*(n)=\frac{(r_{n-1}+g_{n-1}-r_1q)P_c^*(n-1)
+                   -g_{n-2}P_c^*(n-2)}{r_n}.
+ \label{eq:ext-qsd-recursion}
+\end{equation}
+Continue the recurrence until the probabilities become sufficiently
+small, according to a chosen numerical tolerance $\varepsilon$.
+\item Normalize the resulting positive-state probabilities and obtain an
+updated estimate of $P_c^*(1)$. Compare it with the initial guess $q$;
+if they differ appreciably, repeat the procedure with the new estimate.
+\end{enumerate}
+
+This four-step procedure conveys the constructive idea behind the
+quasi-stationary solution. In numerical applications, however, stopping
+when one probability becomes small does not by itself control the
+remaining tail, and normalization does not guarantee convergence or
+nonnegative probabilities. The iteration should therefore be checked
+for stability and positivity; for finite truncated state spaces, an
+eigenvector calculation is often a more reliable alternative.
+
+\subsection{Extinction times from quasi-stationarity}
+\label{subsec:ext-qsd-time}
+
+We now ask a natural question: \emph{how long does it take, on average,
+for a population to become extinct?}. It is
+helpful to begin with $P(0,t)$ rather than directly introducing a first-passage calculation. Assume that $N(0)>0$ and that $g_0=0$, so that zero is absorbing. A population is at zero at time $t$ if and only if it has already become extinct by that time. Thus $P(0,t)$ is precisely the cumulative distribution function of the random variable
+$\tau_0$, the \emph{time to extinction}:
+\begin{equation}
+ \Pr\{\tau_0\leq t\}=P(0,t),
+ \qquad \Pr\{\tau_0>t\}=1-P(0,t)=S(t).
+ \label{eq:ext-cdf-time}
+\end{equation}
+When the extinction-time distribution has a density, it is given by
+$f_{\tau_0}(t)=dP(0,t)/dt$. Consequently, if extinction occurs almost
+surely and the mean is finite, we can write
+\begin{equation}
+ \langle \tau_0\rangle
+ =\int_0^\infty t\,\frac{dP(0,t)}{dt}\,dt.
+ \label{eq:ext-mean-cdf-density}
+\end{equation}
+Integrating by parts over a finite interval $[0,T]$ gives
+\begin{align}
+ \int_0^T t\,\frac{dP(0,t)}{dt}\,dt
+ &=\int_0^T t\,[-S'(t)]\,dt\\
+ &=-T S(T)+\int_0^T S(t)\,dt.
+ \label{eq:ext-parts-finite}
+\end{align}
+For a finite mean extinction time, $T S(T)\to0$ as $T\to\infty$.
+We therefore obtain the particularly useful identity
+\begin{equation}
+ \boxed{\langle \tau_0\rangle
+   =\int_0^\infty [1-P(0,t)]\,dt
+   =\int_0^\infty S(t)\,dt.}
+ \label{eq:ext-survival-integral}
+\end{equation}
+This is the geometric interpretation of the mean extinction time:
+it is the area under the survival-probability curve. More generally,
+the survival-integral identity remains valid as an extended-valued
+expectation even when the mean is infinite (and also if extinction
+is not certain). The derivation using a probability density above
+is particularly transparent in the usual case of almost-sure
+extinction with finite mean.
+\smallskip
+
+We can now approximate this area using the quasi-stationary
+probabilities obtained in the previous subsection. Combining the
+boundary master equation with $P(1,t)=P_c(1,t)[1-P(0,t)]$, we find
+\begin{equation}
+ \frac{dP(0,t)}{dt}
+ =r_1P(1,t)
+ =r_1P_c(1,t)[1-P(0,t)].
+ \label{eq:ext-hazard-p0}
+\end{equation}
+Equivalently, the survival probability obeys
+\begin{equation}
+ \boxed{\frac{dS(t)}{dt}=-r_1P_c(1,t)S(t).}
+ \label{eq:ext-hazard}
+\end{equation}
+The quantity $r_1P_c(1,t)$ is the instantaneous extinction hazard,
+conditional on survival: extinction requires first having a single
+individual and then losing that last individual.
+
+If the initial population size is drawn from a quasi-stationary
+distribution $\pi$, then $P_c(1,t)=\pi_1$ for every $t\geq0$.
+Since $S(0)=1$, integration yields
+\begin{equation}
+ 1-P(0,t)=S(t)=\exp(-r_1\pi_1t).
+ \label{eq:ext-qsd-survival}
+\end{equation}
+Substitution into Eq.~\eqref{eq:ext-survival-integral} gives
+\begin{equation}
+ \boxed{\langle \tau_0\rangle_{\pi}
+    =\int_0^\infty\exp(-r_1\pi_1t)\,dt
+    =\frac{1}{r_1\pi_1}.}
+ \label{eq:ext-qsd-mean}
+\end{equation}
+This expression is \emph{exact} when the process starts in the QSD.
+For a population starting from a specified positive abundance,
+replacing $P_c(1,t)$ by $\pi_1$ gives an \emph{approximation} whose
+accuracy depends on how rapidly the conditional distribution approaches
+quasi-stationarity compared with the characteristic extinction time.
+The initial transient may be important for some starting abundances.
+
+This forward-equation argument begins with the entire distribution
+$P(n,t)$ and uses its probability flux into the absorbing state.
+We next develop a complementary approach: determining the mean time
+to extinction directly from the initial abundance, by means of the
+\emph{backward master equation}.
+
+\subsection{Backward master equations and mean first-passage times}
+\label{subsec:ext-backward}
+
+The forward master equation describes the probability of occupying state
+$n$ at time $t$. A different question is: \emph{starting from a given
+state $n$, how long will it take to reach a particular target for the
+first time?} The answer is the \emph{mean first-passage time} (MFPT),
+\begin{equation}
+ T_n=\mathbb E[\tau_A\mid N(0)=n],\qquad
+ \tau_A=\inf\{t\geq0:N(t)\in A\},
+ \label{eq:ext-mfpt-def}
+\end{equation}
+for a target set $A$. For extinction, $A=\{0\}$ and $T_0=0$.
+
+\subsubsection{First-event argument: the general backward equation}
+For $n\notin A$, the total rate at which an event occurs is
+$R_n=g_n+r_n$. Assuming $R_n>0$, the time until the next event has
+mean $1/R_n$. The next event increases the population with probability
+$g_n/R_n$ and decreases it with probability $r_n/R_n$.
+Conditioning on this first event gives
+\begin{equation}
+ T_n=\frac{1}{R_n}
+   +\frac{g_n}{R_n}T_{n+1}
+   +\frac{r_n}{R_n}T_{n-1}.
+ \label{eq:ext-first-step}
+\end{equation}
+Rearranging,
+\begin{equation}
+ \boxed{-1=g_n(T_{n+1}-T_n)+r_n(T_{n-1}-T_n),
+       \qquad n\notin A.}
+ \label{eq:ext-backward-equation}
+\end{equation}
+The boundary condition is $T_n=0$ for $n\in A$. A finite state space may
+require an additional upper-boundary condition; for an infinite state
+space, further conditions are sometimes needed to select a finite
+solution. The first-passage mean may also be infinite.
+
+Why is the equation called \emph{backward}? The unknown quantity $T_n$
+is indexed by the \emph{initial} state of the process, whereas the
+forward equation follows the probability of the state \emph{reached}
+after a given time. Both are consequences of the same transition rates.
+
+\subsubsection{Worked example: extinction in a pure-death process}
+Suppose each individual dies independently at per-capita rate $\mu$,
+there are no births, and there is no immigration:
+\begin{equation}
+ g_n=0,\qquad r_n=\mu n,\qquad T_0=0.
+ \label{eq:ext-pure-death}
+\end{equation}
+The backward equation reduces to
+\begin{equation}
+ -1=\mu n(T_{n-1}-T_n),\qquad
+ T_n=\frac{1}{\mu n}+T_{n-1}.
+ \label{eq:ext-pure-death-step}
+\end{equation}
+Applying this recurrence repeatedly gives
+\begin{equation}
+ \boxed{T_n=\frac{1}{\mu}\sum_{k=1}^n\frac{1}{k}
+             =\frac{H_n}{\mu}.}
+ \label{eq:ext-pure-death-result}
+\end{equation}
+Here $H_n$ denotes the $n$th harmonic number. For large $n$,
+$H_n\simeq\ln n+\gamma$, where $\gamma$ is Euler's constant. Thus the
+mean extinction time grows roughly logarithmically with initial
+population size. In this simple case the backward method gives an
+exact extinction time without solving the time-dependent forward
+master equation.
+
+\subsubsection{Worked example: time to reach two individuals}
+Consider a site with immigration rate $\lambda>0$, per-capita birth
+rate $\beta\geq0$, and per-capita death rate $\mu\geq0$. How long,
+on average, until a population starting at $n=0$ first reaches $n=2$?
+Only states 0 and 1 need to be considered before the target is reached.
+The rates are $g_0=\lambda$, $g_1=\lambda+\beta$,
+$r_0=0$, $r_1=\mu$; set $T_2=0$. The backward equations read
+\begin{align}
+ -1&=\lambda(T_1-T_0),\label{eq:ext-two-zero}\\
+ -1&=(\lambda+\beta)(T_2-T_1)+\mu(T_0-T_1).
+ \label{eq:ext-two-one}
+\end{align}
+Solving,
+\begin{equation}
+ \boxed{T_1=\frac{1+\mu/\lambda}{\lambda+\beta},\qquad
+ T_0=\frac{1}{\lambda}+\frac{1+\mu/\lambda}{\lambda+\beta}.}
+ \label{eq:ext-two-solution}
+\end{equation}
+The target $n=2$ need not be an absorbing state of the original process:
+we simply stop the clock at the first arrival there. This example
+shows why first-passage methods apply to recovery and colonization as
+well as extinction.
+
+\subsection{Applications and comparison of approaches}
+\label{subsec:ext-applications}
+
+\paragraph{Application: population collapse under harvesting.}
+In an exploited resource population, the transition rates may combine
+reproduction, density-dependent mortality, immigration, and saturating
+harvesting. One illustrative choice is
+\begin{equation}
+ g_n=\lambda+bn,\qquad
+ r_n=dn+\frac{b}{K}n(n-1)+\frac{hn}{a+n}.
+ \label{eq:ext-harvest-example}
+\end{equation}
+Here the last term represents Holling-type-II harvesting. These rates
+are presented only as an \emph{illustrative model}, not as the exact
+microscopic rates in any particular publication. For collapse, choose a
+low-abundance threshold $n_c$ and set $T_n=0$ for $n\leq n_c$; for
+recovery, select an upper threshold instead. The backward equation
+then gives a set of linear relations for the expected threshold-crossing
+times, as in the work of Cuenda, Llorente, and Capit\'an (2020).
+If $\lambda>0$, zero is no longer absorbing: the distinction between
+\emph{first arrival at zero} and \emph{permanent extinction} must then
+be kept explicit.
+
+\paragraph{How the two approaches complement one another.}
+The QSD characterizes \emph{how many individuals are typically present,
+given that extinction has not occurred}. Once this conditional
+distribution is stationary, the extinction hazard is constant and its
+inverse gives the exact mean extinction time for QSD initial data.
+The backward equation instead asks \emph{how long it takes to reach a
+target from a specified initial state}. It need not invoke
+quasi-stationarity and applies to any reachable target, not just zero.
+
+As a useful synthesis, suppose the state $0$ is absorbing and the
+process has a QSD $\pi$. The MFPT $T_n$ from each initial state, if
+finite, satisfies Eq.~\eqref{eq:ext-backward-equation}. Averaging these
+mean times over initial states drawn from $\pi$ must recover the QSD
+result:
+\begin{equation}
+ \boxed{\sum_{n\geq1}\pi_nT_n=\frac{1}{r_1\pi_1},}
+ \label{eq:ext-bridge}
+\end{equation}
+provided these quantities are finite. This equality links the forward
+conditional distribution and the backward first-passage analysis.
+
+\subsubsection*{Exercises}
+\begin{enumerate}
+ \item \textbf{Absorbing boundary and survival.} Starting from the
+ boundary master equation at $n=0$, derive
+ $dS/dt=-r_1P(1,t)$ when $g_0=0$. What changes if immigrants can
+ arrive at an empty site ($g_0>0$)?
+
+ \item \textbf{Conditional probability balance.} Differentiate
+ $P_c(n,t)=P(n,t)/S(t)$ and recover Eqs.~\eqref{eq:ext-qsd-n}
+ and \eqref{eq:ext-qsd-one}. Explain in words why the conditional
+ master equation contains a positive normalization term.
+
+ \item \textbf{Quasi-stationarity and extinction.} Assume that
+ $P_c(n,t)=\pi_n$ for all $t\geq0$. Derive the survival function and
+ show that the mean extinction time is $1/(r_1\pi_1)$. Why is this
+ result not necessarily exact for a population starting from a fixed
+ size $n_0$?
+
+ \item \textbf{Pure-death extinction time.} Derive $T_1$, $T_2$,
+ and $T_3$ from the backward recurrence. Check them against
+ $T_n=H_n/\mu$. Why do additional initial individuals contribute
+ progressively smaller increments to the mean extinction time?
+
+ \item \textbf{A threshold-crossing problem.} Consider immigration,
+ birth, and death with rates $g_n=\lambda+\beta n$ and $r_n=\mu n$.
+ Derive the backward equations for the first passage from $n=0$
+ to $n=2$, and verify Eq.~\eqref{eq:ext-two-solution}. Discuss what
+ happens when $\mu$ increases.
+
+ \item \textbf{Optional numerical project.} Choose a finite-capacity
+ birth--death process with $g_0=0$ and extinction certain. Estimate
+ its QSD from the conditional forward equations or the transient
+ generator, and calculate the MFPTs from the backward equations.
+ Compare $\sum_{n\geq1}\pi_nT_n$ with $1/(r_1\pi_1)$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Take-home message.} The same elementary birth and death
+rates support two distinct but complementary questions: \emph{what does
+a surviving population look like?} and \emph{how long does it take to
+reach extinction or another threshold?} Quasi-stationarity addresses
+the first; backward first-passage equations address the second.

@@ -1,0 +1,239 @@
+% ================================================================
+% Insertable course-note section: backward equations and MFPTs
+% Compatible with notes.tex (amsmath, amssymb already loaded).
+% ================================================================
+\section{Backward master equations and mean first-passage times}
+\label{sec:backward-mfpt}
+
+In previous sections we used the \emph{master equation} to calculate the
+probability $P(n,t)$ of finding a population with $n$ individuals at time $t$.
+For example, we calculated stationary probability distributions for
+immigration--death processes. However, a different question is often more
+relevant to ecology and resource management: \emph{how long will it take a
+population to reach a certain abundance for the first time?} For example,
+we may want to predict the time to extinction of a small population, or the
+time until an exploited fish population falls below a critical threshold.
+These are \emph{first-passage} questions.
+
+\subsection{A simple example: time to extinction in a pure-death process}
+\label{subsec:pure-death-mfpt}
+Consider a population that cannot reproduce or receive immigrants. Each
+individual dies independently at a constant per-capita rate $\mu>0$.
+If the population contains $n$ individuals, the only possible event is
+\begin{equation}
+ n\longrightarrow n-1,\qquad r_n=\mu n,\qquad g_n=0.
+ \label{eq:mfpt-pure-death-rates}
+\end{equation}
+The population eventually reaches $n=0$, an absorbing state: once extinction
+occurs, no further event can occur. Suppose we start with exactly $n$
+individuals. Let $\tau_0$ denote the \emph{first time} the population
+reaches zero:
+\begin{equation}
+ \tau_0=\inf\{t\geq 0:N(t)=0\}.
+ \label{eq:mfpt-hitting-time}
+\end{equation}
+The first-passage time $\tau_0$ is a random variable: different stochastic
+realizations become extinct at different times. Our aim is to calculate
+\begin{equation}
+ T_n=\mathbb{E}[\tau_0\mid N(0)=n],\qquad T_0=0,
+ \label{eq:mfpt-definition}
+\end{equation}
+which is called the \emph{mean first-passage time} (MFPT) to extinction.
+Notice that $T_n$ is a function of the \emph{initial state} $n$, not of
+elapsed time $t$.
+
+We can calculate $T_n$ without solving the full time-dependent master
+equation. If the population currently has $n>0$ individuals, the waiting
+time $W$ until the next death is exponentially distributed with rate $\mu n$.
+Therefore,
+\begin{equation}
+ \mathbb{E}[W]=\frac{1}{\mu n}.
+\end{equation}
+After that event, the system contains $n-1$ individuals. Because the process
+is Markovian, the expected \emph{additional} time to extinction is $T_{n-1}$.
+By adding the two contributions we obtain
+\begin{equation}
+ T_n=\frac{1}{\mu n}+T_{n-1},\qquad n\geq1.
+ \label{eq:mfpt-pure-death-recursion}
+\end{equation}
+Applying this relation repeatedly gives a simple exact result:
+\begin{equation}
+ \boxed{T_n=\frac{1}{\mu}\sum_{k=1}^{n}\frac{1}{k}
+       =\frac{H_n}{\mu}},
+ \label{eq:mfpt-pure-death-solution}
+\end{equation}
+where $H_n$ is the $n$th harmonic number. For large $n$,
+$H_n\simeq\ln n+\gamma$, where $\gamma$ is Euler's constant. Thus,
+$T_n$ grows approximately logarithmically, not linearly, with the initial
+population size. Even this elementary example shows how transition rates
+allow us to predict a biologically meaningful time scale.
+
+\subsection{General derivation for a one-dimensional birth--death process}
+\label{subsec:backward-derivation}
+Let a continuous-time Markov process $N(t)$ take values
+$n=0,1,2,\ldots$, with the two possible transitions
+\begin{equation}
+ n\longrightarrow n+1\quad\text{at rate }g_n,
+ \qquad
+ n\longrightarrow n-1\quad\text{at rate }r_n.
+ \label{eq:mfpt-transition-rates}
+\end{equation}
+The \emph{forward} master equation describes the evolution of the
+probability of occupying the destination state $n$:
+\begin{equation}
+ \frac{dP(n,t)}{dt}=
+ g_{n-1}P(n-1,t)+r_{n+1}P(n+1,t)
+ -(g_n+r_n)P(n,t),
+ \label{eq:mfpt-forward}
+\end{equation}
+with appropriate modifications at the boundaries.
+
+Now consider a target set $A$ (for example, $A=\{0\}$ for extinction, or
+$A=\{0,1,\ldots,n_{\mathrm c}\}$ for collapse below a threshold). Define
+$T_n$ as the expected time to first enter $A$, given that the process starts
+in state $n$. Clearly,
+\begin{equation}
+ T_n=0\quad\text{for }n\in A.
+ \label{eq:mfpt-target-boundary}
+\end{equation}
+For $n\notin A$, let $R_n=g_n+r_n$ be the total rate of events. Assuming
+$R_n>0$, the waiting time to the next event has average $1/R_n$, while the
+next event is a birth with probability $g_n/R_n$ and a death with
+probability $r_n/R_n$. Conditioning on that first event yields
+\begin{equation}
+ T_n=\frac{1}{R_n}
+     +\frac{g_n}{R_n}T_{n+1}
+     +\frac{r_n}{R_n}T_{n-1}.
+ \label{eq:mfpt-first-step}
+\end{equation}
+Multiplying by $R_n$ and rearranging,
+\begin{equation}
+ \boxed{-1=g_n\bigl(T_{n+1}-T_n\bigr)
+             +r_n\bigl(T_{n-1}-T_n\bigr),
+             \qquad n\notin A.}
+ \label{eq:mfpt-backward}
+\end{equation}
+This is the \textbf{backward equation for the mean first-passage time}.
+It is called \emph{backward} because its unknown $T_n$ is indexed by the
+\emph{initial} state from which we start the process. By contrast, the
+forward master equation follows the probabilities of the possible states
+\emph{at a later time}. Both are descriptions of the same stochastic process.
+
+More generally, if $q_{nm}$ denotes the transition rate from state $n$ to a
+different state $m$, the backward equation reads
+\begin{equation}
+ -1=\sum_{m\neq n}q_{nm}(T_m-T_n),\qquad n\notin A,
+ \label{eq:mfpt-general-generator}
+\end{equation}
+subject to $T_n=0$ on $A$. In matrix notation, if $Q$ is the generator
+of the continuous-time Markov chain (with rows corresponding to initial
+states), then the unknown MFPTs outside the target solve
+\begin{equation}
+ Q_{CC}\,\mathbf T_C=-\mathbf 1,
+ \label{eq:mfpt-matrix}
+\end{equation}
+where $C$ is the set of non-target states. This gives a linear system of
+equations rather than a system of differential equations. For a finite
+state space, with an almost-surely reachable target and finite mean hitting
+times, the relevant linear system has a unique finite solution. For an
+infinite state space, additional conditions may be required to select a
+finite, physically meaningful solution; a finite MFPT should not be assumed
+automatically.
+
+\subsection{A second worked example: immigration, births, and deaths}
+\label{subsec:mfpt-threshold-example}
+Imagine a small population at an initially empty site. Immigrants arrive
+at rate $\lambda>0$; resident individuals reproduce at per-capita rate
+$\beta\geq0$ and die at per-capita rate $\mu\geq0$. We ask: \emph{how long
+will it take until the population first reaches two individuals?} This
+question has a very simple answer even though both upward and downward
+transitions are possible. Only the states $n=0,1$ matter before reaching
+our target $A=\{2,3,\ldots\}$.
+
+The relevant rates are
+\begin{equation}
+ g_0=\lambda,\quad r_0=0,\qquad
+ g_1=\lambda+\beta,\quad r_1=\mu.
+\end{equation}
+Our boundary condition is $T_2=0$. The two backward equations are
+\begin{align}
+ -1&=\lambda(T_1-T_0),\label{eq:mfpt-two-state-0}\\
+ -1&=(\lambda+\beta)(T_2-T_1)+\mu(T_0-T_1).
+ \label{eq:mfpt-two-state-1}
+\end{align}
+The first equation gives $T_0=T_1+1/\lambda$. Substituting this and
+$T_2=0$ into the second equation yields
+\begin{equation}
+ \boxed{T_1=\frac{1+\mu/\lambda}{\lambda+\beta},\qquad
+ T_0=\frac{1}{\lambda}+\frac{1+\mu/\lambda}{\lambda+\beta}.}
+ \label{eq:mfpt-two-state-solution}
+\end{equation}
+For example, when $\beta=0$, a death from state $1$ forces us to wait for
+an additional immigrant before trying again to reach state $2$. This
+explains why increasing $\mu$ increases the expected hitting time. Notice
+that reaching two individuals is a \emph{first-passage} event; state 2 does
+not have to be absorbing in the original population model. We only impose
+$T_2=0$ because we stop the clock upon reaching the target.
+
+\subsection{Connection with resource collapse and recovery}
+\label{subsec:mfpt-harvesting}
+Consider now a resource population (for instance, fish) that reproduces,
+experiences density-dependent mortality, and is harvested by consumers.
+An illustrative stochastic model may use the transition rates
+\begin{equation}
+ g_n=\lambda+bn,
+ \qquad
+ r_n=dn+\frac{b}{K}n(n-1)+\frac{hn}{a+n},
+ \label{eq:mfpt-harvest-rates}
+\end{equation}
+where $\lambda$ is immigration, $b$ and $d$ are intrinsic demographic
+parameters, $K$ sets the strength of density dependence, and the final
+term is a saturating Holling-type-II harvesting rate. The term involving
+$n(n-1)$ ensures that density-dependent competitive deaths occur only
+when at least two individuals are present. This is an \emph{illustrative}
+choice of microscopic rates, not a claim about the exact transition rates
+used in any particular published study.
+
+If $n_{\mathrm c}$ is a critical low-abundance threshold, a collapse time
+can be defined as the first time a population starting above that threshold
+reaches $n\leq n_{\mathrm c}$. The corresponding MFPT satisfies
+Eq.~(\ref{eq:mfpt-backward}) for $n>n_{\mathrm c}$, with
+$T_n=0$ for $n\leq n_{\mathrm c}$. Similarly, a recovery time from low
+abundance can be defined by choosing an upper target threshold.
+For numerical calculations we may truncate the state space at some upper
+value $n_{\max}$, but then we must specify what happens at that artificial
+boundary (for instance, a reflecting boundary with $g_{n_{\max}}=0$).
+Predictions should be checked for sensitivity to this truncation.
+
+These questions are particularly relevant to the analysis of nonlinear
+harvesting and stochastic collapse/recovery in the contribution by
+Cuenda, Llorente, and Capit\'an (2020). In that application, the main
+quantity of interest is not simply a stationary distribution: it is the
+expected time to cross a biologically significant threshold.
+
+\subsection{Exercises}
+\begin{enumerate}
+\item Starting from Eq.~(\ref{eq:mfpt-pure-death-recursion}), calculate
+$T_1$, $T_2$, and $T_3$. Why is the increase from $T_2$ to $T_3$ smaller
+than the increase from $T_1$ to $T_2$?
+\item Derive Eq.~(\ref{eq:mfpt-backward}) alternatively by conditioning on
+what happens during a short interval $dt$. Include the probability
+$1-(g_n+r_n)dt+o(dt)$ that no event occurs.
+\item Use a Gillespie simulation to estimate the mean time to extinction
+for a pure-death population. Compare the sample average across many
+replicates with Eq.~(\ref{eq:mfpt-pure-death-solution}).
+\item For the two-individual threshold example, set $\beta=0$ and simplify
+Eq.~(\ref{eq:mfpt-two-state-solution}). Discuss the limits $\mu\to0$ and
+$\mu\to\infty$.
+\item For the harvesting model in Eq.~(\ref{eq:mfpt-harvest-rates}),
+choose a collapse threshold, write its backward recurrence explicitly,
+and solve the resulting linear system numerically after choosing an
+upper boundary. Compare estimates of the MFPT obtained from simulation.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Take-home message.} The forward master equation asks
+\emph{``Where is the population likely to be at time $t$?''} The backward
+MFPT equation asks \emph{``Starting from population size $n$, how long
+will it take to reach a specified state for the first time?''} Both
+questions can be answered using the same elementary transition rates.

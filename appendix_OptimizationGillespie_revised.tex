@@ -1,0 +1,171 @@
+\subsection{Gillespie algorithm: Optimization strategies}
+\label{App:Optimization}
+In the Gillespie algorithm, the total rate should be recalculated after updating the configuration of the system as a result of the realization of a given event. However, it is not required to recalculate it always from scratch, because the realization of a particular event does not necessarily affect the probability rates of all the others, but only some of them. This can be represented by a dependency matrix, which considers how the occurrence of each event (in rows, from 1 to 13, in our example) affects (or not) the occurrence rate of any other event (in columns). More precisely, we prescribe $T_{ij} = 1$ if the occurrence of the $i$-th event changes the rate of the further occurrence of the $j$-th event, and $T_{ij} = 0$ if there is no effect. For event table in the main text, the dependency matrix is:  
+
+\begin{equation}
+{\bf T} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc}
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+\hline
+1 & 0 & 1  & 0 & 1 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+1 & 0 & 1  & 1 & 1 & 1  & 0 & 0 & 0  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 1 & 1 & 1  & 0 & 0 & 0  & 1 & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0  & 1 & 1 & 1  & 1 & 0 & 1  & 1 & 1 & 1 & 1 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 1 & 1 & 1 \\
+0 & 0 & 0  & 0 & 0 & 0  & 1 & 0 & 1  & 1 & 0 & 0 & 0 \\
+0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 1 & 1 & 1 \\
+\end{array}
+\right]
+\label{T_E}
+\end{equation}
+
+As you can see, the second and the eighth column are identically zero because they correspond to changes in immigration rates from neighboring local populations due an event happening in the focal population. Under the assumed source-controlled dispersal rates, changes in the focal population do not change departure rates of individuals located in neighboring populations. This ceases to hold if movement depends on destination occupancy or attractiveness. However, the second and the eighth rows are not zero because they represent the impact of the new incoming immigrant on the rates controlling the events in the focal population.  
+
+For computational purposes, it is useful to express the matrix ${\bf T}$ as an adjacency list, where each row, from $i=1$ to $i=n$, can be regarded as an array collecting the events whose rate changes as a result of the realization if the $i$-th event: 
+
+\begin{equation}
+{\bf A} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc||c}
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 5   & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+\hline
+1 & 3 & 5   & 0  & 0 & 0   & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+1 & 3 & 4   & 5  & 6 & 10  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 6\\
+4 & 5 & 6   & 10 & 0 & 0   & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 4\\
+\hline
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+7 & 9 & 10  & 0 & 0 & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 & 3\\
+\hline
+4  & 5  & 6   & 7  & 9  & 10  & 11 & 12 & 13  & 0 & 0 & 0 & 0 & 9\\
+7  & 9  & 10  & 11 & 12 & 13  & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 6\\
+7  & 9  & 10  & 0  & 0  & 0   & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 3\\
+11 & 12 & 13  & 0  & 0  & 0   & 0 & 0 & 0     & 0 & 0 & 0 & 0 & 3\\
+\end{array}
+\right]
+\label{A_E}
+\end{equation}
+
+The last column of matrix ${\bf A}$ represents the number of non-zero entries of each row, i. e., the number of events whose rate changes as a result of the realization of each row event. This defines a network where each event is a node connected to a number of other events. Each node can be characterized by its adjacency vector whose entries are the events this node is related to, and the length of each adjacency vector is the degree of each node. This network represents the dynamical interrelations between the events.  
+\smallskip
+
+This optimization relies on the fact that the new total rate after an event happens can be calculated in terms of the old one by adding or subtracting a quantity to it. Notice that updating the total rate incrementally is useful even within Gillespie's Direct Method. Gibson and Bruck's Next Reaction Method makes additional use of stored scheduled event times, a dependency graph, and a priority queue; it is not equivalent to this incremental rate update alone. If we define $\vec{n} = (k, n, m, l)$ as the configuration of the system before certain event happens, and $\vec{n}'= (k', n', m', l')$ as the system configuration just after, one only needs to calculate this increment, $\Delta R$, for that particular event, rather than calculate again the total rate, $R$, for each new configuration. To be more precise, we can write for each event $i$: 
+\begin{equation}
+R(\vec{n}'_i) = R(\vec{n}_i) + \Delta R_i
+\end{equation}
+where the realization of the $i$-th event has taken the system from 
+the configuration $\vec{n}_i$ to a new configuration $\vec{n}'_i$, and $\Delta R_i$ is the change in the total rate as a result of the configuration change associated with the occurrence of the $i$-th event. We know that the realization of the $i$-th will only affect the occurrence rate of a subset of all the other possible events, as is depicted by the ${\bf T}$ matrix in Eq.~(\ref{T_E}). Each of the affected events will only change a certain increment. We can then define $\Delta r_{ij}$ as the change in the $j$-th occurrence rate as a result of the realization of the $i$-th event. Therefore, we can decompose $\Delta R_i$ as
+\begin{equation}
+\Delta R_i = \sum_{j=1}^{13} \Delta r_{ij}
+\label{DeltaR}
+\end{equation}
+where the sum runs over the 13 local event types (including the two incoming-event placeholders, whose locally initiated rates are not counted). 
+\smallskip
+
+On average, approximately 4 rates are changed as a result of an event happening in the focal population. Thus, relatively few local propensities need to be updated after a typical event, compared with a naive algorithm that recalculates all local rates from scratch. The exact computational gain depends on data structures, network connectivity and the cost of updating scheduled times. In addition, when an event occurs in a patch, which does not involve movement of individuals, only the rates in that patch change. If the occurring event is the 1 or the 7, which involve movement of propagules or searching individuals, respectively, then both the rates of that focal patch and the rates of the patch receiving immigrants may be affected, which again leaves the rates in all the other patches totally unchanged. This will involve a tremendous gain in computational time. As $M$ increases, a straightforward algorithm that naively updated the total rate over the whole $M$-patch system from scratch after the occurrence of any event will be computationally unaffordable.   
+
+Central to this optimized algorithm is the calculation of the ${\bf \Delta r}$ matrix, whose entries, $\Delta r_{ik}$, represent the change in the rate of event $k$ when it is the event $i$ the one that has occurred. For the consumer--resource model described in the main text, this increment matrix is given by: 
+  
+\begin{center}
+\begin{sideways}
+\begin{minipage}{\textheight}
+\begin{equation}
+{\bf \Delta r} = 
+\left[ \begin{array}{ccc|ccc|ccc|cccc}
+-\mu_P & 0 & -\delta_P   & 0 & -\eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+ \mu_P & 0 &  \delta_P   & 0 &  \eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+-\mu_P & 0 & -\delta_P   & 0 & -\eta_R\,\frac{N-n'}{N} & 0  & 0 & 0 & 0  & 0 & 0 & 0 & 0 \\
+\hline
+ \mu_P & 0  &  \delta_P   & 0        & \eta_R\,\frac{N-n'}{N}          & 0          & 0 & 0 & 0  & 0                   & 0 & 0 & 0  \\
+-\mu_P & 0  & -\delta_P   &  \beta_R & -\frac{\eta_R}{N}(1+k'+(N-n'))  &  \delta_R  & 0 & 0 & 0  & \alpha\frac{m'}{N}  & 0 & 0 & 0 \\
+ 0     & 0  &  0          & -\beta_R & \eta_R\,\frac{k'}{N}            & -\delta_R  & 0 & 0 & 0  & -\alpha\frac{m'}{N} & 0 & 0 & 0 \\
+\hline
+0 & 0 & 0                 & 0 & 0 & 0                                              & -\mu_A & 0 & -\delta_A     & -\alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     &  \alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+0 & 0 & 0                 & 0 & 0 & 0                                              & -\mu_A & 0 &  -\delta_A     & -\alpha\,\frac{n'}{N}       &  0   &  0       &  0 \\
+\hline
+0 & 0 & 0                 & -\beta_R & \eta_R\frac{k'}{N}              & -\delta_R   & -\mu_A & 0 & -\delta_A     & -\frac{\alpha}{N}(1+n'+m') &  \nu &  \beta_A &  \delta_A  \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     & \alpha\,\frac{n'}{N}        & -\nu & -\beta_A & -\delta_A  \\
+0 & 0 & 0                 & 0 & 0 & 0                                              &  \mu_A & 0 &  \delta_A     & \alpha\,\frac{n'}{N}        &  0   &  0       &  0         \\
+0 & 0 & 0                 & 0 & 0 & 0                                              & 0      & 0 &  0            & 0                          & -\nu & -\beta_A & -\delta_A  \\
+\end{array}
+\right]
+\label{Delta_E}
+\end{equation}
+\end{minipage}
+\end{sideways}
+\end{center}
+
+% Here Increment matrix. 
+
+As shown, the row sums of this matrix correspond exactly to the $\Delta R_i$ defined in Eq.~(\ref{DeltaR}). The matrix entries can be classified into two categories: (i) configuration-independent constants and (ii) terms that depend on the system configuration. We adopt the convention of expressing the latter in terms of the updated configuration, $\vec{n}'$, after the corresponding event has occurred. Consequently, only these configuration-dependent increments must be recomputed following the occurrence of an event. For computational efficiency, the configuration-independent terms should be computed once at the beginning of each simulation and stored in RAM for subsequent access as needed.
+
+\paragraph{Example 1: Propagule production (event 4).}
+Consider the production of a resource propagule by an established resource individual,
+$R\rightarrow R+P$. In the focal patch the configuration changes from
+$(k,n,m,l)$ to $(k+1,n,m,l)$. The propagule production rate itself,
+$R_4=\beta_R n$, remains unchanged because the number of established
+resources is unchanged. However, the new propagule increases the rates of
+out-dispersal, propagule mortality, and establishment. Using the propensities
+listed in the main text, the corresponding increments are
+\begin{equation}
+\Delta r_{41}=\mu_P,\qquad
+\Delta r_{43}=\delta_P,\qquad
+\Delta r_{45}=\eta_R\left(1-\frac{n}{N}\right).
+\end{equation}
+All other locally initiated rates are unaffected, and thus
+\begin{equation}
+\boxed{\Delta R_4=\mu_P+\delta_P+\eta_R\left(1-\frac{n}{N}\right).}
+\label{eq:delta_R_production}
+\end{equation}
+Only three local rates need to be updated.
+
+\paragraph{Example 2: Propagule establishment (event 5).}
+Now consider the establishment of a propagule in a free resource site,
+$P+\emptyset\rightarrow R$. Here the configuration changes from
+$(k,n,m,l)$ to $(k-1,n+1,m,l)$. As a result, the rates of propagule
+out-dispersal and mortality decrease, whereas the rates of propagule
+production, established-resource mortality, and consumer attack increase.
+The establishment rate itself also changes because \emph{both} the number
+of propagules and the available space change. The six affected rates are
+\begin{align}
+\Delta r_{51}&=-\mu_P, & \Delta r_{53}&=-\delta_P,\\
+\Delta r_{54}&=\beta_R, & \Delta r_{56}&=\delta_R,\\
+\Delta r_{5,10}&=\frac{\alpha m}{N}, &
+\Delta r_{55}&=R_5(k-1,n+1)-R_5(k,n).
+\end{align}
+Since $R_5(k,n)=\eta_R k(1-n/N)$, we find
+\begin{align}
+\Delta r_{55}
+&=\eta_R\left[(k-1)\left(1-\frac{n+1}{N}\right)
+-k\left(1-\frac{n}{N}\right)\right]\\
+&=-\frac{\eta_R}{N}(N-n+k-1).
+\end{align}
+Consequently, the change in the total rate of locally initiated events is
+\begin{equation}
+\boxed{
+\Delta R_5=-\mu_P-\delta_P+\beta_R+\delta_R
++\frac{\alpha m}{N}
+-\frac{\eta_R}{N}(N-n+k-1).}
+\label{eq:delta_R_establishment}
+\end{equation}
+Notice that the same establishment increment can be written using the
+\emph{updated} configuration $k'=k-1$, $n'=n+1$:
+\begin{equation}
+\Delta r_{55}=-\frac{\eta_R}{N}(1+k'+N-n'),
+\end{equation}
+which agrees with entry $(5,5)$ of matrix $\boldsymbol{\Delta r}$.
+These examples concern events that take place entirely within a focal patch.
+For a dispersal event, the rate changes in both the source and receiving
+patches must be included in the global update. In-dispersal rows 2 and 8
+are bookkeeping counterparts of departures from neighboring patches,
+not additional independent events in the global total rate.
+

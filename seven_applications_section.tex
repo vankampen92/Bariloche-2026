@@ -1,0 +1,317 @@
+% ================================================================
+% Drop-in section for notes.tex
+% Requires \usepackage{amsmath,amssymb} and \usepackage{natbib}.
+% Bibliography entries: advanced_stochastic_processes_readings_seven.bib
+% ================================================================
+\section{Stochastic Markov processes at work: seven selected papers}
+\label{sec:seven-applications}
+
+The following seven studies illustrate how stochastic descriptions of
+individual events can help explain ecological and epidemiological patterns.
+Together, they link continuous-time Markov processes to species
+abundance distributions, mainland--island metapopulation dynamics,
+nonlinear resource harvesting, biodiversity, epidemic oscillations,
+spatial dispersal networks, and hybrid stochastic--deterministic systems. For each study, we identify the
+scientific question, summarize its main ideas, and indicate the mathematical
+concepts that students should understand before reading the paper.
+
+\subsection{Kendall (1948): Population processes and Fisher's logseries}
+\label{subsec:kendall}
+\noindent\textbf{Reference.} \citet{Kendall1948Logseries}.
+
+\medskip\noindent\textbf{Scientific question.}
+Can elementary stochastic processes of reproduction, mortality, and
+immigration provide a mechanistic explanation for Fisher's logarithmic series
+species-abundance distribution?
+
+\medskip\noindent\textbf{Main ideas.}
+Kendall studies population growth models expressed through probabilities of
+individual events occurring in continuous time. A useful starting point is the
+linear immigration--birth--death process, with transition rates
+\begin{equation}
+  g_n=\nu+bn, \qquad r_n=dn,
+\end{equation}
+where $\nu$, $b$, and $d$ are immigration, per-capita birth, and per-capita
+death rates, respectively. When $d>b$, this process admits a stationary
+negative-binomial distribution. This should not be confused with the
+logarithmic-series distribution of species abundances. The latter arises when
+one considers the abundance distribution of immigrant-founded species or
+lineages under suitable assumptions. Its normalized form is
+\begin{equation}
+  P(n)=-\frac{1}{\ln(1-x)}\,\frac{x^n}{n},
+  \qquad n=1,2,\ldots,\quad 0<x<1.
+\end{equation}
+The paper establishes an early, influential connection between explicitly
+stochastic population mechanisms and a recurring ecological pattern.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Linear birth--death--immigration processes and transition rates.
+  \item Master equations for one-step Markov processes.
+  \item Probability generating functions and stationary distributions.
+  \item Negative-binomial and logarithmic-series distributions, and the
+        distinction between population abundance and species abundance.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Derive the stationary distribution of the
+linear immigration--birth--death process and explain what additional
+interpretation or assumptions are needed to recover a logseries for species
+abundances.
+
+\subsection{Alonso and McKane (2002): Immigration and extinction in mainland--island metapopulations}
+\label{subsec:alonso-mckane-metapopulations}
+\noindent\textbf{Reference.} \citet{AlonsoMcKane2002Extinction}.
+
+\medskip\noindent\textbf{Scientific question.}
+How do immigration from a mainland, local colonization, and stochastic patch
+extinction jointly determine the persistence and eventual extinction of a
+metapopulation distributed over a finite number of habitat patches?
+
+\medskip\noindent\textbf{Main ideas.}
+The paper generalizes Levins' classical metapopulation model by introducing
+immigration from an external mainland and explicitly treating the number of
+occupied patches as a continuous-time stochastic variable. For $N$ patches,
+let $n\in\{0,\ldots,N\}$ denote the number of occupied patches. Transitions
+$n\to n+1$ describe immigration-driven or internal colonization of empty
+patches; transitions $n\to n-1$ describe local extinctions. The corresponding
+one-step master equation determines the time-dependent probability of
+observing $n$ occupied patches. Its stationary solution characterizes patch
+occupancy under persistent mainland immigration. The authors also analyze
+fluctuations, the probability that all patches are empty, and mean times to
+metapopulation extinction, using approximations and numerical simulations.
+They then test how far the predictions carry over to lattice and spatially
+realistic patch networks. An important subtlety is that an empty
+metapopulation is not absorbing when mainland immigration remains possible;
+the paper's extinction-time results must therefore be interpreted with
+attention to the boundary conditions and immigration assumptions.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Finite-state birth--death processes for patch occupancy.
+  \item Colonization and extinction rates, including external immigration.
+  \item Master equations, boundary conditions, and stationary distributions.
+  \item Transient extinction probabilities and mean first-passage times.
+  \item Gaussian or linear-noise approximations and finite-size effects.
+  \item Connections between well-mixed patch occupancy and spatial networks.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Write the transition rates for the
+number of occupied patches and derive the corresponding master equation.
+Explain the influence of mainland immigration on occupancy and extinction,
+and distinguish a stationary probability of an empty metapopulation from an
+absorbing extinction state.
+
+
+\subsection{Cuenda, Llorente and Capit\'an (2020): Collapse and recovery under nonlinear harvesting}
+\label{subsec:cuenda-llorente-capitan}
+\noindent\textbf{Reference.} \citet{CuendaLlorenteCapitan2020Harvesting}.
+
+\medskip\noindent\textbf{Scientific question.}
+How does demographic stochasticity affect the timescales of collapse and
+recovery of a renewable resource, such as a fish population, under nonlinear
+harvesting and immigration? Can stochastic transition times differ
+systematically from predictions of a deterministic population model?
+
+\medskip\noindent\textbf{Main ideas.}
+The authors study a resource subject to density-dependent population growth,
+immigration, and nonlinear harvesting. In the deterministic description,
+saturating extraction can generate alternative population regimes and
+bifurcation thresholds associated with collapse and recovery. A related
+continuous-time birth--death process keeps the population discrete and its
+demographic events stochastic. Rather than asking only for the stationary
+abundance distribution, the paper focuses on \emph{transition times}: how
+long it takes the resource population to cross a threshold marking collapse
+or recovery. Analytical and numerical comparisons show that stochastic
+collapse and recovery times are bounded above by the corresponding
+deterministic estimates under the conditions examined, across the range of
+immigration rates considered. This illustrates that demographic noise can
+accelerate transitions in both directions, rather than simply increasing
+extinction risk.
+
+For a generic one-step model with upward rates $g_n$ and downward rates
+$r_n$, the mean first-passage time $T_n$ to a specified absorbing threshold
+satisfies the backward equation
+\begin{equation}
+  -1=g_n(T_{n+1}-T_n)+r_n(T_{n-1}-T_n),
+\end{equation}
+with boundary conditions appropriate to the chosen threshold and population
+state space. This is a general methodological illustration, not a
+replacement for the paper's specific model and boundary conditions.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item One-dimensional continuous-time birth--death processes with nonlinear rates.
+  \item Logistic population growth, saturating harvesting, and deterministic bifurcations.
+  \item Master equations and stochastic trajectories.
+  \item First-passage times and backward equations.
+  \item Boundary conditions and the distinction between extinction, collapse,
+        and recovery thresholds.
+  \item Comparison of stochastic and deterministic transition times.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Construct an event table for a population
+with density-dependent growth, immigration, and saturating harvesting.
+Derive its master equation and the backward recurrence for the mean time to
+reach a collapse threshold. Discuss how the deterministic model and the
+stochastic model characterize collapse and recovery differently.
+
+\subsection{Etienne and Alonso (2007): Neutral community theory}
+\label{subsec:etienne-alonso}
+\noindent\textbf{Reference.} \citet{EtienneAlonso2007Neutral}.
+
+\medskip\noindent\textbf{Scientific question.}
+How can the stochastic balance of local immigration and extinction, together
+with regional speciation and extinction, explain the coexistence of many
+species without invoking species-specific niche differences?
+
+\medskip\noindent\textbf{Main ideas.}
+Neutral community theory describes species as demographically equivalent at
+the level of the processes being modeled, while allowing stochastic birth,
+death, dispersal, and speciation events to generate unequal abundances.
+Dispersal limitation connects local community dynamics to a larger regional
+species pool. The resulting theory provides predictions for diversity and
+species-abundance patterns and clarifies the distinct roles of ecological
+drift, immigration, and speciation. This study develops and synthesizes the
+mathematical framework used to interpret neutral community models and their
+sampling distributions.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Multispecies stochastic population processes and ecological drift.
+  \item Birth--death--immigration dynamics in local communities.
+  \item Neutrality, dispersal limitation, and local--regional coupling.
+  \item Stationary distributions and sampling distributions.
+  \item Probability generating functions and combinatorial probability,
+        where relevant to the chosen derivation.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Select one neutral-community prediction
+and explain which demographic events and dispersal assumptions lead to it.
+Discuss how a local community differs from the regional species pool.
+
+\subsection{Alonso, McKane and Pascual (2007): Stochastic amplification in epidemics}
+\label{subsec:epidemics}
+\noindent\textbf{Reference.} \citet{AlonsoMcKanePascual2007Epidemics}.
+
+\medskip\noindent\textbf{Scientific question.}
+Can demographic stochasticity sustain pronounced epidemic oscillations even
+when the corresponding deterministic epidemic model has a stable equilibrium?
+
+\medskip\noindent\textbf{Main ideas.}
+The model describes discrete infection and demographic events, allowing for
+infections imported from outside the focal population. Around a stable
+endemic state, the intrinsic fluctuations generated by these events can be
+amplified by the dynamical response of the system. Hence, stochastic
+realizations may display relatively coherent epidemic oscillations although
+the deterministic solution relaxes to equilibrium. A system-size expansion
+provides an analytical approximation to fluctuations and their power spectrum.
+This establishes a connection between demographic noise, dynamical
+stability, and recurrent epidemics.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Multivariate continuous-time Markov jump processes.
+  \item Master equations for epidemic compartment models.
+  \item Deterministic limits and linear stability of equilibria.
+  \item van Kampen's system-size expansion and linear noise approximation.
+  \item Fourier transforms, covariance functions, and power spectra.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Explain, using the deterministic Jacobian
+and the stochastic fluctuation equations, how stable deterministic dynamics
+can amplify demographic noise into recurrent epidemics.
+
+\subsection{Nicoletti et al. (2023): Effective metapopulation dynamics from dispersal}
+\label{subsec:metapopulation}
+\noindent\textbf{Reference.} \citet{NicolettiEtAl2023Metapopulation}.
+
+\medskip\noindent\textbf{Scientific question.}
+Can effective colonization rules and metapopulation persistence criteria be
+derived from a mechanistic model that explicitly describes individual
+dispersal across a spatial network?
+
+\medskip\noindent\textbf{Main ideas.}
+The authors distinguish settled individuals, which occupy habitat patches,
+from dispersing individuals (explorers), which move through a network before
+establishing in suitable patches. When dispersal dynamics are fast relative
+to slower local changes, the explorer variables can be eliminated in a
+reduced description. The resulting effective dispersal kernel reflects the
+structure of the underlying network and yields generalized metapopulation
+dynamics. In this way, effective colonization processes and persistence
+thresholds arise from explicit microscopic mechanisms rather than being
+specified solely at the macroscopic level.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Spatial Markov processes and network-based dispersal.
+  \item State vectors, transition rates, and occupancy dynamics.
+  \item Fast--slow dynamics and separation of timescales.
+  \item Quasi-steady-state elimination and effective model reduction.
+  \item Dispersal kernels, matrices, eigenvalues, and persistence thresholds.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Reconstruct the roles of settled
+individuals and explorers, outline the fast-variable elimination, and
+explain how dispersal-network topology becomes encoded in the reduced model.
+
+\subsection{Realpe-Gomez, Galla and McKane (2012): Demographic noise in piecewise-deterministic systems}
+\label{subsec:pdmp}
+\noindent\textbf{Reference.} \citet{RealpeGomezGallaMcKane2012PDMP}.
+
+\medskip\noindent\textbf{Scientific question.}
+How can a large population of discrete individuals interact with continuous
+environmental variables, and how does intrinsic demographic noise change the
+qualitative dynamics, including the emergence of oscillations?
+
+\medskip\noindent\textbf{Main ideas.}
+The authors study hybrid dynamical systems in which the state includes a
+population of discrete individuals and environmental variables evolving
+continuously. Between discrete demographic events, environmental variables
+follow deterministic evolution equations; demographic events occur at
+state-dependent stochastic rates and alter the subsequent dynamics. This
+provides a mechanistic route to piecewise-deterministic Markov processes.
+The framework is motivated in part by semi-arid vegetation systems, where
+plants are discrete and water availability is continuous. Through a
+system-size expansion and numerical analysis, the paper quantifies
+fluctuations around macroscopic dynamics and derives their power spectra.
+These calculations show that demographic noise can generate pronounced,
+characteristic oscillations absent from the corresponding deterministic
+trajectory. The central contribution is the theoretical treatment of
+stochastic hybrid dynamics, rather than the detailed claims about vegetation
+resilience developed in the subsequent 2013 paper.
+
+\medskip\noindent\textbf{Mathematical concepts to review.}
+\begin{itemize}
+  \item Continuous-time Markov jump processes and state-dependent hazards.
+  \item Piecewise-deterministic Markov processes and hybrid state spaces.
+  \item Deterministic flow between stochastic jump events.
+  \item Master or forward equations combining jumps and continuous transport.
+  \item System-size expansions and Gaussian fluctuation approximations.
+  \item Power spectral density and noise-induced quasi-cycles.
+\end{itemize}
+
+\noindent\textbf{Suggested task.} Define a minimal hybrid state consisting
+of one discrete population variable and one continuous environmental
+variable. Describe the event rates, the deterministic flow between jumps,
+and the key steps through which a system-size expansion predicts the
+spectrum of noise-induced fluctuations.
+
+\subsection{A common framework for discussing the seven papers}
+\label{subsec:common-framework}
+
+Each student's presentation should address the same five questions:
+\begin{enumerate}
+  \item What ecological or epidemiological question motivates the model?
+  \item What are the state variables, elementary events, and transition rates?
+  \item Which mathematical tools are used to analyze or approximate the
+        stochastic process?
+  \item What is the principal scientific result?
+  \item What would be missed, altered, or obscured by considering only a
+        deterministic description?
+\end{enumerate}
+
+Where feasible, students should present a table of elementary events and
+rates, a schematic of the stochastic mechanisms, and one central figure or
+analytical result from their assigned paper. Across the seven contributions,
+the unifying methodological idea is to begin with individual-level events
+and derive probabilistic and, when justified, macroscopic descriptions.

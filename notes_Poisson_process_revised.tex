@@ -1,0 +1,116 @@
+\section{The Poisson Process}
+\label{subsection:Poisson_Process}
+
+The Poisson process is the simplest continuous-time stochastic model of individual events. Imagine that people arrive at a front desk independently, with a constant arrival rate $\lambda>0$. Let $X(t)$ count the number of arrivals between time zero and time $t$, with $X(0)=0$. The possible events are 
+\begin{equation}
+ n\longrightarrow n+1 \quad\text{at rate }\lambda.
+\end{equation}
+For a sufficiently small time interval $dt$, we assume
+\begin{align}
+ \Pb\{X(t+dt)=n+1\mid X(t)=n\}&=\lambda\,dt+o(dt),\\
+ \Pb\{X(t+dt)=n\mid X(t)=n\}&=1-\lambda\,dt+o(dt),
+\end{align}
+with probabilities of two or more arrivals in $dt$ of order $o(dt)$. The rate $\lambda$ has units of inverse time. The mean number of arrivals over an interval of length $t$ is $\lambda t$.
+
+\subsection{From an ensemble of realizations to the master equation}
+Imagine $M$ independent replicas of this counting process, all starting with zero arrivals. Let $N(n,t)$ be the number of replicas in which $n$ arrivals have occurred by time $t$. This is a \emph{statistical ensemble}. For a sufficiently large ensemble, the fractions of replicas undergoing each transition approach their corresponding probabilities. We can therefore establish a balance equation describing how the number of replicas in each category changes over a sufficiently short time interval. This equation becomes exact, to first order in \(dt\), in the infinite-ensemble limit. The expected balance over a short interval is
+\begin{equation}
+ N(n,t + dt) =\lambda\,dt\,N(n-1,t)+(1-\lambda\,dt)N(n,t)+o(dt)M,
+\end{equation}
+for $n\geq1$, with the convention $N(-1,t)=0$. The equation describes the
+\emph{expected} numbers of replicas: for finite $M$, the actual category counts fluctuate. In the limit of a large independent ensemble, the fractions
+$N(n,t)/M$ converge to probabilities $P(n,t)=\Pb\{X(t)=n\}$.
+Taking the limit $dt\to0$ gives the \emph{forward master equation}
+\begin{align}
+ \frac{dP(n,t)}{dt}&=\lambda P(n-1,t)-\lambda P(n,t),&&n\geq1,
+ \label{ME_Final_Poisson_n}\\
+ \frac{dP(0,t)}{dt}&=-\lambda P(0,t),&&n=0.
+ \label{ME_Final_Poisson}
+\end{align}
+These are coupled ordinary differential equations, one for each possible
+number of arrivals. Their initial conditions are $P(0,0)=1$ and
+$P(n,0)=0$ for $n\geq1$.
+
+\subsection{Solving the master equation}
+For zero arrivals,
+\begin{equation}
+ P(0,t)=e^{-\lambda t}.
+\end{equation}
+For one arrival, the equation is
+\begin{equation}
+ \frac{dP(1,t)}{dt}+\lambda P(1,t)=\lambda e^{-\lambda t}.
+\end{equation}
+Multiplication by the integrating factor $e^{\lambda t}$ yields
+\begin{equation}
+ \frac{d}{dt}\left[e^{\lambda t}P(1,t)\right]=\lambda,
+ \qquad P(1,t)=\lambda t\,e^{-\lambda t}.
+\end{equation}
+Repeating the procedure (or proving it by induction) gives
+\begin{equation}
+ \boxed{P(n,t)=\frac{(\lambda t)^n}{n!}e^{-\lambda t},\qquad n\geq0.}
+ \label{Eq_Poisson_Final}
+\end{equation}
+Thus, $X(t)$ has a Poisson \emph{distribution} with parameter $\lambda t$.
+In particular,
+\begin{equation}
+ \E[X(t)]=\lambda t,\qquad \operatorname{Var}[X(t)]=\lambda t,
+ \qquad\frac{d\E[X(t)]}{dt}=\lambda.
+ \label{ODE_Average}
+\end{equation}
+The corresponding equation for the mean is exact for this linear process.
+
+\subsection{An alternative derivation using a generating function}
+Using the probability generating function introduced in
+Section~\ref{sec:basic_pgf}, define
+\begin{equation}
+ G(z,t)=\sum_{n=0}^{\infty}P(n,t)z^n.
+\end{equation}
+Multiply each equation of the system given in Eqs (\ref{ME_Final_Poisson_n})-(\ref{ME_Final_Poisson}) by its corresponding factor $z^n$ and sum over all $n\geq0$:
+\begin{equation}
+ \frac{\partial G(z,t)}{\partial t}=\lambda(z-1)G(z,t).
+ \label{GenFunc_Poisson}
+\end{equation}
+For each fixed $z$, this is an ordinary differential equation in time.
+Its general solution is
+\begin{equation}
+ G(z,t)=G(z,0)e^{\lambda(z-1)t}.
+\end{equation}
+\emph{The initial condition, not normalization alone}, determines the
+prefactor. Because $X(0)=0$ with probability 1, this is, $P(0,0)=1$, we have $G(z,0)=1$, so
+\begin{equation}
+ G(z,t)=e^{\lambda t(z-1)}
+ =e^{-\lambda t}\sum_{n=0}^{\infty}\frac{(\lambda t)^n}{n!}z^n.
+\end{equation}
+Comparing coefficients of $z^n$ recovers Eq.~\eqref{Eq_Poisson_Final}.
+Normalization, $G(1,t)=1$, provides a consistency check.
+If instead the initial count has PGF $G(z,0)$, its distribution at time
+$t$ is the convolution of the initial count distribution with the
+Poisson$(\lambda t)$ distribution.
+
+\subsection{Why this is a continuous-time Markov process}
+The probability of the next arrival depends only on the rate $\lambda$,
+not on how many arrivals occurred previously. Its waiting time $T$ satisfies
+\begin{equation}
+ \Pb\{T>t\}=e^{-\lambda t},\qquad \E[T]=\frac{1}{\lambda}.
+\end{equation}
+Hence the waiting time is exponential and memoryless. We will return to this
+result when introducing exact stochastic simulation algorithms.
+
+\subsection{Exercises}
+\begin{enumerate}[label=\textbf{Exercise \arabic*.},leftmargin=*]
+ \item \textbf{Forward equation.} Starting from the small-$dt$ transition
+ probabilities, derive the master equation for $P(n,t)$ and write the
+ boundary equation for $n=0$.
+ \item \textbf{Normalization.} Show directly from the master equation that
+ $d\sum_{n=0}^{\infty}P(n,t)/dt=0$.
+ \item \textbf{Moments.} Multiply the master equation by $n$ and sum over
+ all $n$ to derive $d\E[X(t)]/dt=\lambda$. Repeat for $n^2$ and find
+ the variance.
+ \item \textbf{Generating function.} Solve the equation for $G(z,t)$
+ when $X(0)=m$ rather than zero, and interpret the result.
+ \item \textbf{Two time intervals.} For a homogeneous Poisson process,
+ find the probability that there are no arrivals in $(0,s]$ and exactly
+ two arrivals in $(s,s+t]$. State the additional property of independent
+ increments being used.
+\end{enumerate}
+

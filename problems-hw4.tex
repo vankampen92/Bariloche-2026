@@ -1,0 +1,24 @@
+\subsection*{Problems IV} 
+% You can copy these problems down to the environments below to write your solutions & delete the top subsections.
+
+\begin{easylist}[enumerate]
+# Consider the dynamics of a closed population driven by density-independent birth and death rates. The growth (or decline) of such a population ca be described in terms of a one-step process with following transition rates:
+\begin{eqnarray}
+g_n & = & \beta\,n  \nonumber \\ 
+r_n & = & \delta\,n \nonumber
+\end{eqnarray}
+## Write the master equation to describe the temporal evolution for the probability of the population attaining $n$ individuals at time $t$. 
+## Consider the population have $n_0$ individuals at the initial time. Write the equation for the temporal evolution of the probability generating function, $G(x,t)$, and solve it using the method of characteristics. 
+## Calculate the expected extinction time of the population. Consider the case that the population have $n_0$ individuals at the initial time and that the population will certainly decline, this is, $\beta < \delta$. Check through simulations that your expression matches the average of extinction time over stochastic replicates. 
+
+# Consider the simplest stochastic model underlying Island Biogegoraphy Theory. This momdel describes the temporal evolution for the number of species in an island, $n$. Species colonize the island at rate $\lambda$ from a mainland and undergo extinction. The mainland harbors a total number of potentially colonizing species, $S$.   
+## Write the master equation to describe the temporal evolution for the probability of the island harboring $n$ species at time $t$. 
+## Consider the island contains no species at the initial time. Write the equation for the temporal evolution of the probability generating function, $G(x,t)$, and solve it using the method of characteristics.
+## Give an explicit expression for the temporal evolution of variance in the number of species in the island.
+## Usually bigger islands harbor more species. Assume that extinction an colonization rates scale with area according to:
+\begin{eqnarray}
+\lambda & = & \lambda_0\, A^{\beta}   \nonumber \\ 
+\delta  & = & \delta_0 \, A^{-\alpha} \nonumber  
+\end{eqnarray}
+where $\alpha$ and $\beta$ are positive exponents. Calculate the model prediction for the species-area relationship, this is, the function giving the number of species in the island as area size increases. Check your result trough simulations.   
+\end{easylist}

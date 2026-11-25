@@ -1,0 +1,256 @@
+% Insert after the one-dimensional theory and before stochastic simulation.
+% Requires amsmath and amssymb (already loaded in main-AdvancedCourse.tex).
+\section{Multidimensional Master Equations}
+\label{sec:multidimensional-master}
+
+So far, we have considered populations whose state is fully characterized by a
+single non-negative integer, $n$. In this section we generalize the
+construction of the master equation to systems in which several quantities
+change in time. Examples include interacting species, the susceptible and
+infected individuals of an epidemic, and populations living in different
+habitat patches. The guiding principle remains the same: \emph{specify all
+possible elementary events and their transition rates, and then account for
+probability flowing into and out of each configuration.} We shall develop the
+probabilistic description independently of the algorithms used to simulate it.
+
+\subsection{The state vector and the elementary events}
+\label{subsec:multi-events}
+
+Consider a system described at time $t$ by the random state vector
+\begin{equation}
+    \mathbf{N}(t)=(N_1(t),N_2(t),\ldots,N_S(t)),
+    \qquad \mathbf{N}(t)\in\mathcal S\subseteq\mathbb{Z}_{\geq 0}^{S}.
+    \label{eq:multi-state}
+\end{equation}
+The components might count individuals of different species, individuals in
+various epidemiological compartments, or populations in distinct habitat
+patches. The set $\mathcal S$ contains the physically admissible
+configurations. The probability that the system has configuration
+$\mathbf n=(n_1,\ldots,n_S)$ at time $t$ is written
+\begin{equation}
+    P(\mathbf n,t)=\Pr\{\mathbf N(t)=\mathbf n\}.
+\end{equation}
+Normalization requires $\sum_{\mathbf n\in\mathcal S}P(\mathbf n,t)=1$.
+
+Suppose there are $M$ kinds of elementary events, indexed by $k$. Event $k$
+changes the state by a fixed \emph{stoichiometric} or \emph{jump} vector
+\begin{equation}
+    \boldsymbol\nu_k=(\nu_{k1},\ldots,\nu_{kS}),
+    \qquad \mathbf n\longrightarrow\mathbf n+\boldsymbol\nu_k,
+\end{equation}
+and occurs with transition rate (or propensity) $a_k(\mathbf n)\geq 0$.
+More precisely, conditional on the current configuration $\mathbf n$,
+\begin{equation}
+ \Pr\{\text{event $k$ occurs during }[t,t+dt)\mid\mathbf N(t)=\mathbf n\}
+ =a_k(\mathbf n)\,dt+o(dt).
+ \label{eq:multi-small-time}
+\end{equation}
+The probability of two or more events during such an interval is $o(dt)$.
+We assume here that the rates are time-independent and that the process is
+non-explosive. If an event would produce a state outside $\mathcal S$, its
+rate must vanish. In this way, boundary conditions are encoded in the event
+rates themselves.
+
+The collection $\{\boldsymbol\nu_k,a_k(\mathbf n)\}_{k=1}^M$ defines a
+continuous-time Markov jump process: once its present configuration is known,
+its future evolution does not depend on how it arrived there. Notice that a
+single elementary event may change \emph{more than one} component of the
+state vector at once. This is a crucial difference from a one-dimensional
+birth--death process, even though we still describe dynamics as a sequence of
+individual jumps.
+
+\subsection{Derivation of the general master equation}
+\label{subsec:multi-derivation}
+
+Let $A(\mathbf n)=\sum_{k=1}^M a_k(\mathbf n)$ denote the total rate of
+leaving configuration $\mathbf n$. During a sufficiently short interval
+$dt$, a system found at $\mathbf n$ either remains there or is reached from
+one of the configurations $\mathbf n-\boldsymbol\nu_k$ through event $k$.
+Thus, up to terms smaller than $dt$,
+\begin{align}
+ P(\mathbf n,t+dt)={}&
+   [1-A(\mathbf n)dt]P(\mathbf n,t) \nonumber\\
+ &+dt\sum_{k=1}^{M}
+       a_k(\mathbf n-\boldsymbol\nu_k)
+       P(\mathbf n-\boldsymbol\nu_k,t)+o(dt).
+ \label{eq:multi-bookkeeping}
+\end{align}
+The first term accounts for systems which remain in $\mathbf n$; each term
+in the sum is an incoming probability flux. Subtracting $P(\mathbf n,t)$,
+dividing by $dt$, and taking $dt\to0$ gives the \emph{multidimensional
+master equation}:
+\begin{equation}
+ \boxed{\displaystyle
+ \frac{\partial P(\mathbf n,t)}{\partial t}
+ =\sum_{k=1}^{M}\left[
+    a_k(\mathbf n-\boldsymbol\nu_k)
+    P(\mathbf n-\boldsymbol\nu_k,t)
+    -a_k(\mathbf n)P(\mathbf n,t)
+  \right].}
+ \label{eq:multi-master}
+\end{equation}
+Whenever $\mathbf n-\boldsymbol\nu_k$ is not an admissible state, the
+corresponding incoming term is understood to be zero. As in the
+one-dimensional case, this is not a single ordinary differential equation:
+it is a coupled system of equations, one for every configuration in
+$\mathcal S$.
+
+\paragraph{Recovering the one-dimensional birth--death equation.}
+For $S=1$, choose two events with
+$\nu_1=+1$, $a_1(n)=g_n$ and $\nu_2=-1$,
+$a_2(n)=r_n$. Equation~\eqref{eq:multi-master} becomes
+\begin{equation}
+ \frac{dP(n,t)}{dt}
+ =g_{n-1}P(n-1,t)+r_{n+1}P(n+1,t)
+  -(g_n+r_n)P(n,t),
+ \label{eq:multi-recovery}
+\end{equation}
+precisely the birth--death master equation derived earlier (with the
+appropriate treatment at $n=0$). The higher-dimensional formulation is
+therefore a direct generalization, not a different kind of stochastic model.
+
+\subsection{A worked example: stochastic predator--prey interactions}
+\label{subsec:multi-predator-prey}
+
+Consider two populations: prey, whose number is $n$, and predators, whose
+number is $p$. We begin with a deliberately simple model. Prey reproduce
+independently at per-capita rate $b$; predator--prey encounters occur at
+rate $a$ per potential pair and each successful encounter consumes one prey
+and produces one additional predator; predators die at per-capita rate $d$.
+The state is $\mathbf n=(n,p)$, with $n,p=0,1,\ldots$.
+
+\begin{center}
+\begin{tabular}{llll}
+\hline
+Elementary event & State change & Jump vector & Rate \\
+\hline
+Prey reproduction & $(n,p)\to(n+1,p)$ & $(+1,0)$ & $bn$ \\
+Predation and predator reproduction & $(n,p)\to(n-1,p+1)$ & $(-1,+1)$ & $anp$ \\
+Predator death & $(n,p)\to(n,p-1)$ & $(0,-1)$ & $dp$ \\
+\hline
+\end{tabular}
+\end{center}
+
+The term $anp$ is a mass-action encounter rate at fixed habitat area. The
+second event is particularly instructive: the disappearance of one prey and
+the appearance of one predator are \emph{one single elementary event}, not
+two independent events. All three rates are non-negative and automatically
+vanish when a required individual is absent.
+
+We now write the equation for $P(n,p,t)$ by accounting separately for the
+three ways in which the configuration $(n,p)$ can be reached:
+\begin{itemize}
+ \item A prey birth from $(n-1,p)$, at rate $b(n-1)$.
+ \item A predation event from $(n+1,p-1)$, at rate $a(n+1)(p-1)$.
+ \item A predator death from $(n,p+1)$, at rate $d(p+1)$.
+\end{itemize}
+The probability also decreases whenever one of the three events occurs in
+$(n,p)$. The master equation is therefore
+\begin{align}
+ \frac{\partial P(n,p,t)}{\partial t}={}&
+       b(n-1)P(n-1,p,t) \nonumber\\
+ &+a(n+1)(p-1)P(n+1,p-1,t) \nonumber\\
+ &+d(p+1)P(n,p+1,t) \nonumber\\
+ &-[bn+anp+dp]P(n,p,t).
+ \label{eq:multi-predator-master}
+\end{align}
+Terms with negative arguments are zero. At $n=0$ or $p=0$, some terms
+vanish: there is no predation without prey or predators, and neither
+population can become negative. If either species becomes extinct in this
+minimal model, it cannot spontaneously reappear. More realistic versions
+could include immigration, density dependence, or other processes; these
+would simply add further rows to the event table and terms to the master
+equation.
+
+\subsection{Equations for averages and the deterministic description}
+\label{subsec:multi-moments}
+
+The master equation describes the entire probability distribution. Often,
+however, we are also interested in average abundances. For any function
+$f(\mathbf n)$, multiply Eq.~\eqref{eq:multi-master} by $f(\mathbf n)$,
+sum over all configurations, and shift indices in the incoming terms. This
+gives
+\begin{equation}
+ \boxed{\displaystyle
+ \frac{d}{dt}\langle f(\mathbf N)\rangle
+ =\left\langle\sum_{k=1}^{M}a_k(\mathbf N)
+    [f(\mathbf N+\boldsymbol\nu_k)-f(\mathbf N)]\right\rangle.}
+ \label{eq:multi-observable}
+\end{equation}
+Here $\langle\cdot\rangle$ denotes an ensemble average. In particular,
+with $f(\mathbf n)=n_i$ we obtain the exact moment equation
+\begin{equation}
+ \boxed{\displaystyle
+ \frac{d\langle N_i\rangle}{dt}
+   =\sum_{k=1}^{M}\nu_{ki}\langle a_k(\mathbf N)\rangle.}
+ \label{eq:multi-first-moment}
+\end{equation}
+This result provides a direct bridge from elementary stochastic events to
+macroscopic rates of change.
+
+For the predator--prey example, it gives
+\begin{align}
+ \frac{d\langle n\rangle}{dt}
+      &=b\langle n\rangle-a\langle np\rangle,\\
+ \frac{d\langle p\rangle}{dt}
+      &=a\langle np\rangle-d\langle p\rangle.
+ \label{eq:multi-predator-means}
+\end{align}
+These equations are \emph{exact}, but they are not closed: the average
+$\langle np\rangle$ depends on the joint distribution of prey and predator
+abundances. Indeed,
+\begin{equation}
+ \langle np\rangle=\langle n\rangle\langle p\rangle
+                       +\operatorname{Cov}(n,p).
+ \label{eq:multi-covariance}
+\end{equation}
+Replacing $\langle np\rangle$ by
+$\langle n\rangle\langle p\rangle$ neglects this covariance and produces
+the familiar deterministic mass-action equations for mean abundances. This
+is a \emph{moment-closure approximation}, not in general an exact identity.
+Stochastic population dynamics can generate correlations even when the
+initial abundances are independent.
+
+A deterministic limit can also be motivated by introducing a system-size
+parameter $\Omega$ (for example, habitat area) and density variables
+$x=n/\Omega$, $y=p/\Omega$. For a fixed encounter coefficient $\alpha$,
+we then write the predation rate as $\alpha np/\Omega$ so that all
+macroscopic rates scale with $\Omega$. If relative fluctuations become
+negligible as $\Omega$ increases, the limiting densities satisfy
+\begin{equation}
+ \frac{dx}{dt}=bx-\alpha xy,\qquad
+ \frac{dy}{dt}=\alpha xy-dy.
+ \label{eq:multi-deterministic-limit}
+\end{equation}
+The conditions under which such an approximation is accurate deserve
+careful attention. In particular, extinction events and fluctuations near
+small populations are precisely among the phenomena that may be lost in a
+deterministic approximation. A systematic treatment of the
+large-system-size approximation can be developed separately (see Appendix \ref{App:LargeN-expansion}).
+
+\subsection{Why the multidimensional formulation matters}
+\label{subsec:multi-why}
+
+The same construction works whether components of the state vector refer to
+species, infection classes, or locations. In a spatially explicit
+metapopulation model, for example, $N_i$ might be the abundance in habitat
+patch $i$. A dispersal event from patch $i$ to patch $j$ then has jump
+vector $-\mathbf e_i+\mathbf e_j$, where $\mathbf e_i$ is the unit vector
+for patch $i$. Such an event simultaneously decreases one local population
+and increases another. All spatial information is encoded in the allowed
+events and their rates, not in a change of the master-equation principle.
+
+The essential distinction is thus between \emph{specifying the stochastic
+model} and \emph{choosing how to study it}. The master equation provides a
+complete probabilistic description. Stationary distributions, moment
+equations, approximations, and stochastic simulations are different ways of
+extracting information from that same model.
+
+\subsection{Exercises}
+\label{subsec:multi-exercises}
+\begin{enumerate}
+ \item \textbf{Independent populations.} Suppose two species reproduce and die independently, with transition rates $b_i n_i$ and $d_i n_i$ for species $i=1,2$. Write the four jump vectors and derive the two-dimensional master equation. Under what initial conditions does its joint distribution factorize at later times?
+ \item \textbf{Predation and boundaries.} Starting from Eq.~\eqref{eq:multi-predator-master}, write explicitly the equations for $P(0,p,t)$ and $P(n,0,t)$. Explain which events remain possible at these boundaries.
+ \item \textbf{Moment closure.} Derive an equation for $d\langle np\rangle/dt$ using Eq.~\eqref{eq:multi-observable}. Identify the higher-order moments that appear. Why does an equation for the average not generally close on its own?
+ \item \textbf{Dispersal between two sites.} Let $(n_1,n_2)$ describe individuals in two habitat patches. Individuals disperse from patch 1 to patch 2 at rate $m_{12}n_1$, and in the reverse direction at rate $m_{21}n_2$. Derive the master equation and show that $n_1+n_2$ is conserved along every trajectory.
+\end{enumerate}

@@ -1,0 +1,34 @@
+\subsection*{Problems II} 
+% You can copy these problems down to the environments below to write your solutions & delete the top subsections.
+
+\begin{easylist}[enumerate]
+
+# Consider two independent random variables, $X_1$ and $X_2$, sampled from the same probability distribution. Show that the probability that $\Pb(X_1 < X_2) = 1/2$ for any distribution. Hint: If you measure\footnote{Measuring a random variable means actualizing its potential, since a random variable is just a variable that can potentially take a bunch of different values according to its probability distribution.} first the second random variable $X_2$ and obtain the value $y$, recall that $\Pb(X_1 < y) = F_1(y)$ is the distribution function associated to the random variable $X_1$. Use, of course, that $F_1(y)$ and $F_2(y)$ are the same function. 
+## Consider now that $X_1$ is described by an exponential distribution with rate $\lambda_1$, while $X_2$ follows also an exponential distribution but with a different rate $\lambda_2$. Calculate the probability that $\Pb(X_1 < X_2)$.  
+
+# Check that the differential equation for the probability generating function, $G(x,t)$, of a counting Poisson process is given by:
+$$\frac{\partial G(x,t)}{\partial t} = x \lambda G(x,t) - \lambda G(x,t)$$
+## Check that your result from Hw1.2 satisfies the equation above.
+
+# If a system of $N$ individuals at certain time zero starts loosing individuals through independent individual deaths at rate $\delta$, we say that the system undergoes a {\em pure death process}. Transition probability rates are given by:
+\begin{align*}
+	g_n &=0 \\
+    r_n &=\delta n
+\end{align*}
+## Write the set of differential equations describing the $\Pb(n,t)$ for $n=0, \dots, N$, the so-called master equation. 
+## Take the initial condition $\Pb(N,0) = 1$ and $\Pb(n,0) = 0$ for $n<N$. Solve the master equation and find $\Pb(n,t)$. Hint: Review the notes of the first lecture where details of how to find the solution for a counting Poisson process are explained. 
+## Find the differential equation for the probability generating function, $G(x,t)$, of this pure death process.
+
+# At the core of Gillespie's algorithm there is the distribution of waiting times between events. This inter-event time follows an exponential distribution with parameter the total rate of the system undergoing any possible configuration change. 
+## Build simulation code to recover the exponential distribution as the waiting time to the next event for the counting Poisson process with rate $\lambda$.
+###  Sample $n$ inter-event times, $(t_1, t_2, ... t_n)$, and plot a histogram to show how they are distributed.
+###  Check your histogram matches the probability density of an exponential distribution of parameter $\lambda$
+
+## Consider an island receiving individuals, at rate $\lambda$, which do not reproduce in nor emigrate from the island, but just experience independent deaths at rate $\mu$. The equation describing the temporal evolution for the number of individuals in the island is given by:
+$$ \frac{dn}{dt} = \lambda - \mu n $$
+### If the system has $n$ individuals at certain point in time, what is the total probability that the system undergoes either the arrival on a new individual or the  death of any of those in the current population of size $n$ in a given $dt$? Check that the total rate for this configuration change to happen is:
+$$R_n = \lambda + \mu n$$ 
+### Build a number of stochastic realizations using Gillespie algorithm. Assume the island is empty at time 0. Sample the population at prescribed times $t_i = i \Delta t$ for $i=0, \dots N$. Build a different histogram for $n$ at each time. Represent the evolution of these histograms on a population-time plot. Calculate the population average over realizations at each time and plot it. 
+### Integrate the deterministic equation with the same initial condition ($n(0)=0$) as before, analytically and/or numerically ({\tt deSolve} in R). Represent this temporal evolution and compare this curve with the one for the average obtained through simulations\footnote{These two curves should match. When we say that Gillespie algorithm is exact, this is what we mean.}.
+\end{easylist}
+
