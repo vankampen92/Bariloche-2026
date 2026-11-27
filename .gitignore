@@ -14,6 +14,10 @@
 *.out
 *.toc
 *.synctex.gz
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
 
 # Temporary files
 *~
@@ -21,8 +25,3 @@
 
 # Secrets
 .env
-main-AdvancedCourse.bbl
-main-AdvancedCourse.blg
-main-AdvancedCourse.fdb_latexmk
-main-AdvancedCourse.fls
-main-AdvancedCourse.pdf
