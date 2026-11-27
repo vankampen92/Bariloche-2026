@@ -1,0 +1,17 @@
+immigration_mode: notes
+beta: 1
+delta: 0.2
+K: 400
+m: 0.002
+I: 0.8
+a: 0.08
+tau: 0.2
+boats_after: 18.3
+t_switch: 10
+t_end: 70
+n_sim: 10
+master_seed: 2026
+no-harvest deterministic equilibrium: 320.1994
+initial abundance: 320
+final deterministic abundance: 145.851
+final stochastic abundances: 103, 1, 0, 4, 65, 66, 122, 77, 1, 163
