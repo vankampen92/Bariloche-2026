@@ -136,7 +136,7 @@ Notice the symmetry of the reproduction process of both resources and consumers 
 \renewcommand{\arraystretch}{1.18}
 \begin{tabular}{@{}r p{0.33\linewidth} p{0.35\linewidth} l@{}}
 \hline
-No. & Event & Change in focal state & Propensity \\
+No. & Event & Change in focal state & Probality Rate \\
 \hline
 1 & Propagule dispersal (departure) & $(k,n,m,l)\to(k-1,n,m,l)$ & $\mu_P k$ \\
 3 & Propagule death & $(k,n,m,l)\to(k-1,n,m,l)$ & $\delta_P k$ \\
@@ -151,29 +151,29 @@ No. & Event & Change in focal state & Propensity \\
 13 & Handling consumer death & $(k,n,m,l)\to(k,n,m,l-1)$ & $\delta_A l$ \\
 \hline
 \end{tabular}
-\caption{Configurational changes and their corresponding probability rates or {\em propensities}}
+\caption{Configurational changes and their corresponding probability rates or {\em propensities} in a local patch. Notice that the processes 2 and 8, which correspond to the in-going immigration events, with the arrival of new individuals into the local patch do not contribute to the total rate of that patch ($R^j(\vec{n}_j$), and, therefore, are not listed here.}
 \label{tab:Configuration-change rates}
 \end{table}
 \noindent Here $k$, $n$, $m$, and $l$ denote resource propagules, established resources, searching consumers, and handling consumers, respectively. For departure events the simultaneous arrival in the selected destination patch is part of the \emph{same} global event. In particular, establishment consumes one propagule; this was omitted from one transition in the original list.
   
-Using the notation already explained in a previous section, we may write the analogous expression for the total rate (see Eq (\ref{Rate})) for a given focal population in the configuration state $\vec{n}=(k,n,m,l)$ to undergo any change as:
+The total rate for a given focal population in the configuration state $\vec{n}=(k,n,m,l)$ to undergo any change can be written as: 
 \begin{equation}
-R^j(\vec{n}) = \sum_{i\in\{1,3,4,5,6,7,9,10,11,12,13\}} R^{\textup{out}}_i(\vec{n}_j)
+R^j(\vec{n}_j) = \sum_{i\in\{1,3,4,5,6,7,9,10,11,12,13\}} R^j_i(\vec{n}_j)
 \label{Rate_j}
 \end{equation}
-where here the superscript and subscipt $j$ emphasizes that this corresonds to the $j-th$ focal population belonging to a network of communities or metacommunity, with $j=1, \dots, M$. We remark also that the {\em in-disperal rates} number 2 and 8 are not considered. The reason is that they are linked to events that have an origin in a neighboring patch, whose rates will be considered when calculating the total rates of those neighboring patches. In that way, as explained in the previous section, the {\em grand} total rate associated to the whole $M$-patch system undergoing any change in any focal patch will safely be the sum of Eq (\ref{Rate_j}) over patches (without counting dispersal processes twice). This will be the {\em grand} total rate controlling the stochastic time, analogous to previous Eq (\ref{eq:R_M}):
+where here the subscript $i$ labels the different process rates, and superscript corresonds to the $j-th$ focal population belonging to a network of $M$ communities (a metacommunity), with $j=1, \dots, M$. We remark also that the {\em in-disperal rates} number 2 and 8 are not considered. The reason is that they are linked to events that have an origin in a neighboring patch, whose rates will be considered when calculating the total rates of those neighboring patches. In that way,  the {\em grand} total rate associated to the whole $M$-patch system undergoing any change in any focal patch will safely be the sum of Eq (\ref{Rate_j}) over all patches (without counting dispersal processes twice). This will be the {\em grand} total rate controlling the stochastic time, analogous to previous Eq (\ref{eq:R_M}):
 \begin{equation}
   R(t) =  \sum_{j=1}^{M} R^j(\vec{n}_j)
   \label{eq:RD_M}
 \end{equation}  
  
-An optimal implementation requires to store a matrix of changes in propensities $\mathbf{\Delta r}$ together with auxiliary dependency matrices $\mathbf A$ and $\mathbf T$ (see Appendix \ref{App:Optimization})
+An optimal implementation requires storing the matrix of propensity changes $\mathbf{\Delta r}$ and the auxiliary dependency matrices $\mathbf A$ and $\mathbf T$. The auxiliary matrices encode the dependency graph among the processes in a local patch, which is identical across all patches (see Appendix \ref{App:Optimization}).
 
 \subsubsection*{The master equation}
-The transition rates control the temporal evolution of the probability that the system is in a given configuration, $\vec{n}=(k,n,m,l)$. On the one hand, we have already calculated the total rate at which the system leaves this state (see Eq (\ref{Rate})). On the other, we can also calculate the total rate at which the system falls in this state from other possible states. The balance between these two (in- and out-) overall processes control the evolution of the whole probability distribution $P(k,n,m,l; t)$. This can be represented by master equation of the system. In our example, we can write: 
+If we consider just one patch without considering individual jumps between patches, we can easily write a master equation. This equation for the whole system of $M$ patches can also be written but here we constraint us to this simpler version for a single patch. As we know, the transition rates will control the temporal evolution of the probability that the system is in a given configuration, $\vec{n}=(k,n,m,l)$. First, we have already calculated the total rate at which the system leaves this state (see Eq (\ref{Rate_j})). And, also, we can calculate the total rate at which the system falls in this state from other possible states. The balance between these two (in- and out-) overall processes control the evolution of the whole probability distribution $P(k,n,m,l; t)$. This can be represented by the master equation of a local isolated patch. In our example, we can write: 
 \begin{equation}
-	\frac{dP(\vec{n}; t)}{dt} = \sum_{i=1}^M R^{\textup{in}}_i(\vec{n}')P(\vec{n}';t) - R^{\textup{out}}(\vec{n})\,P(\vec{n}; t)
+	\frac{dP(\vec{n}; t)}{dt} = \sum_{\vec{n}'} R^{\textup{in}}(\vec{n}')P(\vec{n}';t) - R^{\textup{out}}(\vec{n})\,P(\vec{n}; t)
 	\label{eq:ME}
 \end{equation} 
-where $R^{\textup{out}}(\vec{n})$ is given by Eq (\ref{Rate}), but here the superscript  emphasizes it is the total out-rate from a general configuration $\vec{n}=(k,n,m,l)$. For every  transition rate in Eqs (\ref{T1})-(\ref{T7}), we can write the corresponding transition rate at which the system falls in that state ($\vec{n}=(n,m,l,k)$). This equation governs the temporal evolution of the probability that the system occupies the various configurations within a given local population, in the absence of diffusion.
+where $R^{\textup{out}}(\vec{n})$ corresponds to $R^j(n_j)$, as given by Eq ($\ref{Rate_j}$), if the pacth considered is the $j$-th one. For simplicity, we have dropped the $j$ subscript. Instead, here the superscripts $\textup{out}$ and $\textup{in}$  emphasize they are the total out-rate from a general configuration $\vec{n}=(k,n,m,l)$, and the different in-rates from other configurations into the current one, $\vec{n}=(k,n,m,l)$, respectively. For every  transition rate in Table \ref{tab:consumer-resource-events}, we can write the corresponding transition rate at which the system falls into the focal state ($\vec{n}=(n,m,l,k)$). This equation governs the temporal evolution of the probability that the system occupies the various local configurations within a given local population, in the absence of diffusion.
 
